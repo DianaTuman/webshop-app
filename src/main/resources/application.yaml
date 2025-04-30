@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: webshop-app
+
+  servlet:
+    multipart:
+      max-request-size: 418018841
+      max-file-size: 20848820
+      file-size-threshold: 1048576
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/practicum
+    username: ${DB_USER}
+    password: ${DB_PASS}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
