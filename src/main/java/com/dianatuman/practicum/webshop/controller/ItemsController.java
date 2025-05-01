@@ -1,9 +1,14 @@
 package com.dianatuman.practicum.webshop.controller;
 
+import com.dianatuman.practicum.webshop.dto.ItemDTO;
 import com.dianatuman.practicum.webshop.service.ItemService;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Controller
 @RequestMapping("/items")
@@ -33,35 +38,56 @@ public class ItemsController {
 //            				"hasNext" - можно ли пролистнуть вперед
 //            				"hasPrevious" - можно ли пролистнуть назад
     @GetMapping
-    @ResponseBody
     public String getItems(Model model, @RequestParam(value = "search", defaultValue = "") String search,
                            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-                           @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber) {
+                           @RequestParam(name = "pageNumber", defaultValue = "1") Integer pageNumber) {
+        model.addAttribute("items", itemService.getItems());
         return "items";
     }
 
-    //    е) GET "/items/{id}" - карточка товара
-//    Возвращает:
-//    шаблон "item.html"
-//    используется модель для заполнения шаблона:
-//            "item" - товаров (id, title, decription, count, price)
     @GetMapping("/{id}")
-    @ResponseBody
     public String getItem(@PathVariable(name = "id") long id, Model model) {
         model.addAttribute("item", itemService.getItem(id));
         return "item";
     }
 
-
-    //    ж) POST "/items/{id}" - изменить количество товара в корзине
-//    Параматры:
-//    action - значение из перечисления PLUS|MINUS|DELETE (PLUS - добавить один товар, MINUS - удалить один товар, DELETE - удалить товар из корзины)
-//    Возвращает:
-//    редирект на "/items/{id}"
     @PostMapping("/{id}")
-    @ResponseBody
-    public String setItemCartCount(@PathVariable(name = "id") long id) {
+    public String setItemCartCount(@PathVariable(name = "id") long id, @RequestParam String action) {
+        itemService.setItemCartCount(id, action);
         return String.format("redirect:/items/%s", id);
+    }
+
+    @GetMapping("/add")
+    public String addItemPage() {
+        return "add-item";
+    }
+
+    @PostMapping(path = "/add", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public String addItem(@RequestPart("itemName") String itemName, @RequestPart("description") String description,
+                          @RequestPart("image") MultipartFile image, @RequestPart("price") double price) throws IOException {
+        itemService.addItem(new ItemDTO(itemName, description, price, image.getBytes()));
+        return "redirect:/items";
+    }
+
+    @GetMapping("/{id}/edit")
+    public String editItemPage(@PathVariable(name = "id") long id, Model model) {
+        model.addAttribute("item", itemService.getItem(id));
+        return "add-item";
+    }
+
+    @PostMapping(path = "/{id}/edit", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    public String editItem(@PathVariable(name = "id") long id, Model model,
+                           @RequestPart("itemName") String itemName, @RequestPart("description") String description,
+                           @RequestPart("image") MultipartFile image, @RequestPart("price") double price) throws IOException {
+        itemService.editItem(id, new ItemDTO(itemName, description, price, image.getBytes()));
+        model.addAttribute("item", itemService.getItem(id));
+        return String.format("redirect:/items/%s", id);
+    }
+
+    @PostMapping("/{id}/delete")
+    public String deleteItem(@PathVariable(name = "id") long id) {
+        itemService.deleteItem(id);
+        return "redirect:/items";
     }
 
 }

@@ -20,11 +20,11 @@
             </h2>
             <table>
                 <tr th:each="item : ${order.items()}">
-                    <td th:text="${item.getTitle()+' ('+item.getCount()+' шт.) '+(item.getPrice()*item.getCount())+' руб.'}"></td>
+                    <td th:text="${item.getItemName()+' ('+item.getCount()+' шт.) '+(item.getPrice()*item.getCount())+' руб.'}"></td>
                 </tr>
             </table>
             <p>
-                <b th:text="${'Сумма: '+order.totalSum()}+' руб.'"></b>
+                <b th:text="${'Сумма: '+order.getTotalSum()}+' руб.'"></b>
             </p>
         </td>
     </tr>

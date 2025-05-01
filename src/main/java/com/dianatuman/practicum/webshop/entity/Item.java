@@ -16,8 +16,9 @@ public class Item {
 
     private String description;
 
-    private Float price;
+    private Double price;
 
     @Lob
+    @Basic(fetch = FetchType.LAZY)
     private byte[] image;
 }

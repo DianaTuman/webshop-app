@@ -13,6 +13,10 @@ java {
     }
 }
 
+ext {
+    mapstructVersion = "1.6.0"
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
