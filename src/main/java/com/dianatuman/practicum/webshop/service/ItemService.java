@@ -5,6 +5,8 @@ import com.dianatuman.practicum.webshop.entity.Item;
 import com.dianatuman.practicum.webshop.mapper.ItemMapper;
 import com.dianatuman.practicum.webshop.repository.ItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -29,14 +31,12 @@ public class ItemService {
         return itemRepository.getReferenceById(itemId).getImage();
     }
 
-    public List<ItemDTO> getItems() {
-        return getDTOs(itemRepository.findAll());
+    public Page<ItemDTO> getItems(String search, Pageable pageRequest) {
+        return itemRepository.findByItemNameContainingIgnoreCase(search, pageRequest).map(itemMapper::toDTO);
     }
 
     public ItemDTO getItem(long itemId) {
-        ItemDTO dto = itemMapper.toDTO(itemRepository.getReferenceById(itemId));
-        setCount(dto);
-        return dto;
+        return setCount(itemMapper.toDTO(itemRepository.getReferenceById(itemId)));
     }
 
     public void addItem(ItemDTO itemDTO) {
@@ -46,10 +46,6 @@ public class ItemService {
     public void editItem(long itemId, ItemDTO itemDTO) {
         itemDTO.setId(itemId);
         itemRepository.save(itemMapper.toEntity(itemDTO));
-    }
-
-    public void deleteItem(long itemId) {
-        itemRepository.deleteById(itemId);
     }
 
     public void setItemCartCount(long itemId, String action) {
@@ -78,14 +74,13 @@ public class ItemService {
     }
 
     private List<ItemDTO> getDTOs(List<Item> entities) {
-        List<ItemDTO> list = entities.stream().map(entity -> itemMapper.toDTO(entity)).toList();
-        list.forEach(this::setCount);
-        return list;
+        return entities.stream().map(entity -> itemMapper.toDTO(entity)).map(this::setCount).toList();
     }
 
-    private void setCount(ItemDTO dto) {
+    private ItemDTO setCount(ItemDTO dto) {
         if (cartItems.containsKey(dto.getId())) {
             dto.setCount(cartItems.get(dto.getId()));
         }
+        return dto;
     }
 }
