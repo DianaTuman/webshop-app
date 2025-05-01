@@ -6,12 +6,22 @@
 </head>
 
 <body>
-<a href="/cart/items" style="float:right;">
-    <b>КОРЗИНА &cudarrr;</b>
-</a>
-<a href="/items" style="float:right;">
-    <b>ГЛАВНАЯ &cudarrr;</b>
-</a>
+<table style="width:70%;margin-left:auto;margin-right:auto;">
+    <tr>
+        <td>
+            <a href="/cart/items" style="float:right;">
+                <b>КОРЗИНА</b>
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="/items" style="float:right;">
+                <b>ГЛАВНАЯ</b>
+            </a>
+        </td>
+    </tr>
+</table>
 <table style="width:70%;margin-left:auto;margin-right:auto;">
     <tr th:each="order : ${orders}">
         <td>

@@ -18,7 +18,6 @@ public class Item {
 
     private Double price;
 
-    @Lob
     @Basic(fetch = FetchType.LAZY)
     private byte[] image;
 }

@@ -62,10 +62,10 @@ public class ItemsController {
         return "add-item";
     }
 
-    @PostMapping(path = "/add", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String addItem(@RequestPart("itemName") String itemName, @RequestPart("description") String description,
-                          @RequestPart("image") MultipartFile image, @RequestPart("price") double price) throws IOException {
-        itemService.addItem(new ItemDTO(itemName, description, price, image.getBytes()));
+                          @RequestPart("image") MultipartFile image, @RequestPart("price") String price) throws IOException {
+        itemService.addItem(new ItemDTO(itemName, description, Double.valueOf(price), image.getBytes()));
         return "redirect:/items";
     }
 
@@ -75,11 +75,11 @@ public class ItemsController {
         return "add-item";
     }
 
-    @PostMapping(path = "/{id}/edit", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PostMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public String editItem(@PathVariable(name = "id") long id, Model model,
                            @RequestPart("itemName") String itemName, @RequestPart("description") String description,
-                           @RequestPart("image") MultipartFile image, @RequestPart("price") double price) throws IOException {
-        itemService.editItem(id, new ItemDTO(itemName, description, price, image.getBytes()));
+                           @RequestPart("image") MultipartFile image, @RequestPart("price") String price) throws IOException {
+        itemService.editItem(id, new ItemDTO(itemName, description, Double.valueOf(price), image.getBytes()));
         model.addAttribute("item", itemService.getItem(id));
         return String.format("redirect:/items/%s", id);
     }

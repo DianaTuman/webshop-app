@@ -39,6 +39,7 @@ public class CartController {
     @PostMapping("/buy")
     public String buyCart(Model model) {
         Long orderId = orderService.createOrder(itemService.getCartItems());
+        itemService.clearCart();
         model.addAttribute("order", orderService.getOrder(orderId));
         return String.format("redirect:/orders/%s?newOrder=true", orderId);
     }

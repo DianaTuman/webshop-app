@@ -6,15 +6,29 @@
 </head>
 
 <body>
-<a href="/orders" style="float:right;">
-    <b>ЗАКАЗЫ</b>
-</a>
-<a href="/cart/items" style="float:right;">
-    <b>КОРЗИНА</b>
-</a>
-<a href="/items" style="float:right;">
-    <b>ГЛАВНАЯ</b>
-</a>
+<table style="width:70%;margin-left:auto;margin-right:auto;">
+    <tr>
+        <td>
+            <a href="/orders" style="float:right;">
+                <b>ЗАКАЗЫ</b>
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="/cart/items" style="float:right;">
+                <b>КОРЗИНА</b>
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <a href="/items" style="float:right;">
+                <b>ГЛАВНАЯ</b>
+            </a>
+        </td>
+    </tr>
+</table>
 <h1 style="text-align:center" th:if="${newOrder}">Поздравляем! Успешная покупка! &#128578;</h1>
 <table style="width:70%;margin-left:auto;margin-right:auto;">
     <tr>
