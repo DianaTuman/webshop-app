@@ -33,10 +33,10 @@
 <table style="width:70%;margin-left:auto;margin-right:auto;">
     <tr>
         <td>
-            <h2 th:text="${'Заказ №'+order.id()}"></h2>
+            <h2 th:text="${'Заказ №'+order.getId()}"></h2>
         </td>
     </tr>
-    <tr th:each="item : ${order.items()}">
+    <tr th:each="item : ${order.getItems()}">
         <td>
             <table>
                 <tr>
@@ -48,7 +48,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <b th:text="${item.getTitle()}"></b>
+                        <b th:text="${item.getItemName()}"></b>
                     </td>
                     <td>
                         <b th:text="${item.getCount()}+' шт.'"></b>
@@ -62,7 +62,7 @@
     </tr>
     <tr>
         <td>
-            <h3 th:text="${'Сумма: '+order.totalSum()}+' руб.'"></h3>
+            <h3 th:text="${'Сумма: '+order.getTotalSum()}+' руб.'"></h3>
         </td>
     </tr>
 </table>

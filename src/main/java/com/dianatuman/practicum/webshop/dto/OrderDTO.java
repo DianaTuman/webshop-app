@@ -1,10 +1,14 @@
 package com.dianatuman.practicum.webshop.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@ToString
 public class OrderDTO {
 
     private Long id;

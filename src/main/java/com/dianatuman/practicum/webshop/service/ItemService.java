@@ -1,10 +1,8 @@
 package com.dianatuman.practicum.webshop.service;
 
 import com.dianatuman.practicum.webshop.dto.ItemDTO;
-import com.dianatuman.practicum.webshop.entity.Item;
 import com.dianatuman.practicum.webshop.mapper.ItemMapper;
 import com.dianatuman.practicum.webshop.repository.ItemRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -16,14 +14,13 @@ import java.util.Map;
 @Service
 public class ItemService {
 
-    @Autowired
-    ItemMapper itemMapper;
+    private final ItemMapper itemMapper;
+    private final ItemRepository itemRepository;
 
     private final Map<Long, Integer> cartItems = new HashMap<>();
 
-    private final ItemRepository itemRepository;
-
-    public ItemService(ItemRepository itemRepository) {
+    public ItemService(ItemMapper itemMapper, ItemRepository itemRepository) {
+        this.itemMapper = itemMapper;
         this.itemRepository = itemRepository;
     }
 
@@ -32,7 +29,8 @@ public class ItemService {
     }
 
     public Page<ItemDTO> getItems(String search, Pageable pageRequest) {
-        return itemRepository.findByItemNameContainingIgnoreCase(search, pageRequest).map(itemMapper::toDTO);
+        return itemRepository.findByItemNameContainingIgnoreCase(search, pageRequest)
+                .map(itemMapper::toDTO).map(this::setCount);
     }
 
     public ItemDTO getItem(long itemId) {
@@ -66,15 +64,12 @@ public class ItemService {
     }
 
     public List<ItemDTO> getCartItems() {
-        return getDTOs(itemRepository.findAllById(cartItems.keySet()));
+        return itemRepository.findAllById(cartItems.keySet())
+                .stream().map(itemMapper::toDTO).map(this::setCount).toList();
     }
 
     public void clearCart() {
         cartItems.clear();
-    }
-
-    private List<ItemDTO> getDTOs(List<Item> entities) {
-        return entities.stream().map(entity -> itemMapper.toDTO(entity)).map(this::setCount).toList();
     }
 
     private ItemDTO setCount(ItemDTO dto) {

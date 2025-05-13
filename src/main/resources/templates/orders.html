@@ -26,10 +26,10 @@
     <tr th:each="order : ${orders}">
         <td>
             <h2>
-                <a th:text="${'Заказ №'+order.id()}" th:href="${'/orders/'+order.id()+'?newOrder=false'}"></a>
+                <a th:text="${'Заказ №'+order.getId()}" th:href="${'/orders/'+order.getId()+'?newOrder=false'}"></a>
             </h2>
             <table>
-                <tr th:each="item : ${order.items()}">
+                <tr th:each="item : ${order.getItems()}">
                     <td th:text="${item.getItemName()+' ('+item.getCount()+' шт.) '+(item.getPrice()*item.getCount())+' руб.'}"></td>
                 </tr>
             </table>

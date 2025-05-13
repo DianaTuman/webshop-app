@@ -4,6 +4,7 @@ import com.dianatuman.practicum.webshop.dto.ItemDTO;
 import com.dianatuman.practicum.webshop.service.ItemService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,13 +23,15 @@ public class ItemsController {
         this.itemService = itemService;
     }
 
-    // "sort" - сортировка перечисление NO, ALPHA, PRICE (по умолчанию, NO - не использовать сортировку)
     @GetMapping
-    public String getItems(Model model, @RequestParam(value = "search", defaultValue = "") String search,
+    public String getItems(Model model, @RequestParam(name = "search", defaultValue = "") String search,
                            @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
-                           @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber) {
-        Page<ItemDTO> items = itemService.getItems(search, PageRequest.of(pageNumber, pageSize));
+                           @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
+                           @RequestParam(name = "sort", defaultValue = "") String sort) {
+        Page<ItemDTO> items = itemService.getItems(search,
+                PageRequest.of(pageNumber, pageSize, sort.isEmpty() ? Sort.unsorted() : Sort.by(sort).ascending()));
         model.addAttribute("search", search);
+        model.addAttribute("sort", sort);
         model.addAttribute("paging", items.getPageable());
         model.addAttribute("items", items);
         return "items";
