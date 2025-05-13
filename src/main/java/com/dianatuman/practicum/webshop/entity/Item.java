@@ -27,4 +27,10 @@ public class Item {
     public Item(Long id) {
         this.id = id;
     }
+
+    public Item(String itemName, String description, Double price) {
+        this.description = description;
+        this.price = price;
+        this.itemName = itemName;
+    }
 }
