@@ -3,7 +3,6 @@ package com.dianatuman.practicum.webshop.controller;
 import com.dianatuman.practicum.webshop.dto.ItemDTO;
 import com.dianatuman.practicum.webshop.service.ItemService;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.support.PagedListHolder;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

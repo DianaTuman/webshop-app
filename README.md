@@ -19,6 +19,6 @@ The application will start at **localhost:8080**.
 * **gradle bootRun** command to run application
 
 ### **To run this application with Docker:**
-
-* **Docker** must be installed and running
-* **docker-compose up --build** command to run the app inside the docker container
+**Docker** must be installed and running
+1. **gradle clean bootJar** command to create a jar
+2. **docker-compose up --build** command to run the jar inside the docker container

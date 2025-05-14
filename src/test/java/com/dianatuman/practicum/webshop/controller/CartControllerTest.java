@@ -1,7 +1,6 @@
 package com.dianatuman.practicum.webshop.controller;
 
 import com.dianatuman.practicum.webshop.dto.ItemDTO;
-import com.dianatuman.practicum.webshop.dto.OrderDTO;
 import com.dianatuman.practicum.webshop.service.ItemService;
 import com.dianatuman.practicum.webshop.service.OrderService;
 import org.junit.jupiter.api.Test;
