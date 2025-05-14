@@ -21,7 +21,3 @@ The application will start at **localhost:8080**.
 **Docker** must be installed and running
 1. **gradle clean bootJar** command to create a jar
 2. **docker-compose up --build** command to run the jar inside the docker container
-
-
-# TO ADD ITEMS
-Please use **/items/add** page.
