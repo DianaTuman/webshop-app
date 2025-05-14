@@ -15,7 +15,6 @@ The application will start at **localhost:8080**.
 * **PostgreSQL** must be installed and running at **localhost:5432**.
   Environment variables **'DB_USER'** and **'DB_PASS'** must be set for accessing database and a schema named *
   *practicum** must exist in database.
-* **gradle bootJar** command to create a jar, that can be later used with command **java -jar myapp.jar**
 * **gradle bootRun** command to run application
 
 ### **To run this application with Docker:**
