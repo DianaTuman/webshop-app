@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Витрина товаров</title>
+    <title>Web Shop</title>
 </head>
 
 <body>
@@ -10,14 +10,14 @@
     <tr>
         <td>
             <a href="/orders" style="float:right;">
-                <b>ЗАКАЗЫ</b>
+                <b>ORDERS</b>
             </a>
         </td>
     </tr>
     <tr>
         <td>
             <a href="/cart/items" style="float:right;">
-                <b>КОРЗИНА</b>
+                <b>CART</b>
             </a>
         </td>
     </tr>
@@ -27,34 +27,34 @@
         <td>
             <form>
                 <p>
-                    <label for="search">Найти: </label>
+                    <label for="search">Search: </label>
                     <input id="search" style="width:300px;" name="search" th:value="${search}"/>
                     <button name="action">&#128269;</button>
                 </p>
                 <p>
-                    <label for="sort">Сортировка: </label>
+                    <label for="sort">Sort: </label>
                     <select id="sort" name="sort" onchange="this.form.submit()">
-                        <option value="" th:selected="${sort==''}">нет</option>
-                        <option value="itemName" th:selected="${sort=='itemName'}">по алфавиту</option>
-                        <option value="price" th:selected="${sort=='price'}">по цене</option>
+                        <option value="" th:selected="${sort==''}">no</option>
+                        <option value="itemName" th:selected="${sort=='itemName'}">alphabet</option>
+                        <option value="price" th:selected="${sort=='price'}">price</option>
                     </select>
                 </p>
                 <p>
-                    <label for="pageSize">Число товаров: </label>
+                    <label for="pageSize">On page: </label>
                     <select id="pageSize" name="pageSize" onchange="this.form.submit()">
-                        <option value="5" th:selected="${paging.getPageSize()==5}">5</option>
-                        <option value="10" th:selected="${paging.getPageSize()==10}">10</option>
-                        <option value="20" th:selected="${paging.getPageSize()==20}">20</option>
-                        <option value="50" th:selected="${paging.getPageSize()==50}">50</option>
-                        <option value="100" th:selected="${paging.getPageSize()==100}">100</option>
+                        <option value="5" th:selected="${pageSize==5}">5</option>
+                        <option value="10" th:selected="${pageSize==10}">10</option>
+                        <option value="20" th:selected="${pageSize==20}">20</option>
+                        <option value="50" th:selected="${pageSize==50}">50</option>
+                        <option value="100" th:selected="${pageSize==100}">100</option>
                     </select>
                 </p>
                 <p>
-                    <button th:if="${items.hasPrevious()}" name="pageNumber" th:value="${paging.getPageNumber()-1}">
+                    <button th:if="${items.hasPrevious()}" name="pageNumber" th:value="${pageNumber-1}">
                         &lt;
                     </button>
-                    <span th:text="${'Страница: '+paging.getPageNumber()}"></span>
-                    <button th:if="${items.hasNext()}" name="pageNumber" th:value="${paging.getPageNumber()+1}">&gt;
+                    <span th:text="${'Page: '+ pageNumber}"></span>
+                    <button th:if="${items.hasNext()}" name="pageNumber" th:value="${pageNumber+1}">&gt;
                     </button>
                 </p>
             </form>
@@ -75,7 +75,7 @@
                         <b th:text="${item.getItemName()}"></b>
                     </td>
                     <td>
-                        <b th:text="${item.getPrice()}+' руб.'"></b>
+                        <b th:text="${item.getPrice()}+' $'"></b>
                     </td>
                 </tr>
                 <tr>
@@ -87,8 +87,8 @@
                             <button name="action" value="minus">-</button>
                             <span th:text="${item.getCount()}"></span>
                             <button name="action" value="plus">+</button>
-                            <button name="action" value="plus" th:if="${item.getCount()==0}" style="float:right;">В
-                                корзину
+                            <button name="action" value="plus" th:if="${item.getCount()==0}" style="float:right;">Add to
+                                Cart
                             </button>
                         </form>
                     </td>

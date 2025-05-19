@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Витрина товаров</title>
+    <title>Web Shop</title>
 </head>
 
 <body>
@@ -10,21 +10,21 @@
     <tr>
         <td>
             <a href="/orders" style="float:right;">
-                <b>ЗАКАЗЫ</b>
+                <b>ORDERS</b>
             </a>
         </td>
     </tr>
     <tr>
         <td>
             <a href="/cart/items" style="float:right;">
-                <b>КОРЗИНА</b>
+                <b>CART</b>
             </a>
         </td>
     </tr>
     <tr>
         <td>
             <a href="/items" style="float:right;">
-                <b>ГЛАВНАЯ</b>
+                <b>HOME</b>
             </a>
         </td>
     </tr>
@@ -35,7 +35,7 @@
     </p>
     <p>
         <b th:text="${item.getItemName()}"></b>
-        <b th:text="${item.getPrice()}+' руб.'" style="text-align:right;"></b>
+        <b th:text="${item.getPrice()}+' $'" style="text-align:right;"></b>
     </p>
     <p>
         <span th:text="${item.getDescription()}"></span>
@@ -44,7 +44,7 @@
         <button name="action" value="minus">-</button>
         <span th:text="${item.getCount()}"></span>
         <button name="action" value="plus">+</button>
-        <button name="action" value="plus" th:if="${item.getCount()==0}" style="float:right;">В корзину</button>
+        <button name="action" value="plus" th:if="${item.getCount()==0}" style="float:right;">Add to Cart</button>
     </form>
 </div>
 </body>

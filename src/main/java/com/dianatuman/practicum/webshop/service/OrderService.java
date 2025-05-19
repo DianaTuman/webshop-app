@@ -6,54 +6,43 @@ import com.dianatuman.practicum.webshop.entity.Item;
 import com.dianatuman.practicum.webshop.entity.Order;
 import com.dianatuman.practicum.webshop.entity.OrderItem;
 import com.dianatuman.practicum.webshop.mapper.ItemMapper;
-import com.dianatuman.practicum.webshop.repository.OrderItemRepository;
 import com.dianatuman.practicum.webshop.repository.OrderRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class OrderService {
 
     private final ItemMapper itemMapper;
     private final OrderRepository orderRepository;
-    private final OrderItemRepository orderItemRepository;
 
-    public OrderService(ItemMapper itemMapper, OrderRepository orderRepository, OrderItemRepository orderItemRepository) {
+    public OrderService(ItemMapper itemMapper, OrderRepository orderRepository) {
         this.itemMapper = itemMapper;
         this.orderRepository = orderRepository;
-        this.orderItemRepository = orderItemRepository;
     }
 
-    public OrderDTO getOrder(long orderId) {
-        return mapOrderDTOFromEntity(orderRepository.getReferenceById(orderId));
+    public Mono<OrderDTO> getOrder(long orderId) {
+        return orderRepository.findById(orderId).map(this::mapOrderDTOFromEntity);
     }
 
-    public List<OrderDTO> getOrders() {
-        return orderRepository.findAll().stream().map(this::mapOrderDTOFromEntity).toList();
+    public Flux<OrderDTO> getOrders() {
+        return orderRepository.findAll().map(this::mapOrderDTOFromEntity);
     }
 
-    public Long createOrder(List<ItemDTO> cartItems) {
-        Order newOrder = orderRepository.save(new Order());
-        List<OrderItem> list = cartItems.stream()
-                .map(item -> new OrderItem(newOrder, new Item(item.getId()), item.getCount())).toList();
-        orderItemRepository.saveAll(list);
-        return newOrder.getId();
+    public Mono<OrderDTO> createOrder(Flux<ItemDTO> cartItems) {
+        var cart = cartItems.map(item -> new OrderItem(new Item(item.getId()), item.getCount()));
+        return orderRepository.createNewOrder(cart).map(this::mapOrderDTOFromEntity);
     }
 
     private OrderDTO mapOrderDTOFromEntity(Order orderEntity) {
-        List<OrderItem> items = orderEntity.getItems();
-        if (items != null) {
-            List<ItemDTO> list = items.stream()
-                    .map(orderItem -> {
-                        ItemDTO item = itemMapper.toDTO(orderItem.getItem());
-                        item.setCount(orderItem.getCount());
-                        return item;
-                    }).toList();
-            return new OrderDTO(orderEntity.getId(), list);
-        }
-        return new OrderDTO(orderEntity.getId(), new ArrayList<>());
+        var items = orderRepository.getOrderItems(orderEntity.getId());
+        var list = items
+                .map(orderItem -> {
+                    ItemDTO item = itemMapper.toDTO(orderItem.getItem());
+                    item.setCount(orderItem.getCount());
+                    return item;
+                });
+        return new OrderDTO(orderEntity.getId(), list);
     }
-
 }

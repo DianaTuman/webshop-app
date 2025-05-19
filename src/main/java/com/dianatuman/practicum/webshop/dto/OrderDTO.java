@@ -3,8 +3,9 @@ package com.dianatuman.practicum.webshop.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Objects;
 
 @Data
@@ -14,10 +15,10 @@ public class OrderDTO {
 
     private Long id;
 
-    private List<ItemDTO> items;
+    private Flux<ItemDTO> items;
 
-    public double getTotalSum() {
-        return items.stream().mapToDouble(item -> item.getPrice() * item.getCount()).sum();
+    public Mono<Double> getTotalSum() {
+        return items.map(item -> item.getPrice() * item.getCount()).reduce(0.0, Double::sum);
     }
 
     @Override

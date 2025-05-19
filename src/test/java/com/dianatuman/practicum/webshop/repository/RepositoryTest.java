@@ -4,7 +4,6 @@ import com.dianatuman.practicum.webshop.entity.Item;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -38,11 +37,10 @@ public class RepositoryTest {
 
     @Test
     public void findItemByItemNameTest() {
-        Item item1 = itemRepository.save(new Item("TestItem", "Desc", 11.0));
+        var item1 = itemRepository.save(new Item("TestItem", "Desc", 11.0));
         itemRepository.save(new Item("ItemName", "Desc", 11.0));
 
-        var found = itemRepository.findByItemNameContainingIgnoreCase("test", PageRequest.of(0, 2))
-                .toList();
+        var found = itemRepository.findByItemNameContainingIgnoreCase("test").collectList().block();
 
         assertThat(found).isNotNull();
         assertThat(found).hasSize(1);

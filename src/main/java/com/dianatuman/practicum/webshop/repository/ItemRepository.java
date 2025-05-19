@@ -1,13 +1,14 @@
 package com.dianatuman.practicum.webshop.repository;
 
 import com.dianatuman.practicum.webshop.entity.Item;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.r2dbc.repository.Query;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 
 @Repository
-public interface ItemRepository extends JpaRepository<Item, Long> {
+public interface ItemRepository extends R2dbcRepository<Item, Long> {
 
-    Page<Item> findByItemNameContainingIgnoreCase(String itemName, Pageable pageRequest);
+    Flux<Item> findByItemNameContainingIgnoreCase(String itemName);
 }

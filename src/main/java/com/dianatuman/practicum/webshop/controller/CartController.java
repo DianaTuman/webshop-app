@@ -1,13 +1,14 @@
 package com.dianatuman.practicum.webshop.controller;
 
 import com.dianatuman.practicum.webshop.dto.ItemDTO;
+import com.dianatuman.practicum.webshop.dto.OrderDTO;
 import com.dianatuman.practicum.webshop.service.ItemService;
 import com.dianatuman.practicum.webshop.service.OrderService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Controller
 @RequestMapping("/cart")
@@ -23,24 +24,25 @@ public class CartController {
     }
 
     @GetMapping("/items")
-    public String getCartItems(Model model) {
-        List<ItemDTO> cartItems = itemService.getCartItems();
-        model.addAttribute("items", cartItems);
-        model.addAttribute("total", cartItems.stream().mapToDouble(item -> item.getPrice() * item.getCount()).sum());
-        return "cart";
+    public Mono<String> getCartItems(Model model) {
+        Flux<ItemDTO> cartItems = itemService.getCartItems();
+        model.addAttribute("items", cartItems.collectList());
+        model.addAttribute("total",
+                cartItems.map(item -> item.getPrice() * item.getCount()).reduce(0.0, Double::sum));
+        return Mono.just("cart");
     }
 
     @PostMapping("/items/{itemId}")
-    public String setItemCartCount(@PathVariable long itemId, @RequestParam String action) {
+    public Mono<String> setItemCartCount(@PathVariable long itemId, @RequestParam String action) {
         itemService.setItemCartCount(itemId, action);
-        return "redirect:/cart/items";
+        return Mono.just("redirect:/cart/items");
     }
 
     @PostMapping("/buy")
-    public String buyCart(Model model) {
-        Long orderId = orderService.createOrder(itemService.getCartItems());
+    public Mono<String> buyCart(Model model) {
+        var order = orderService.createOrder(itemService.getCartItems());
         itemService.clearCart();
-        model.addAttribute("order", orderService.getOrder(orderId));
-        return String.format("redirect:/orders/%s?newOrder=true", orderId);
+        model.addAttribute("order", order);
+        return Mono.just(String.format("redirect:/orders/%s?newOrder=true", order.map(OrderDTO::getId).block()));
     }
 }

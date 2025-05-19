@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <title>Витрина товаров</title>
+    <title>Item</title>
 </head>
 
 <body>
@@ -10,21 +10,21 @@
     <tr>
         <td>
             <a href="/orders" style="float:right;">
-                <b>ЗАКАЗЫ</b>
+                <b>ORDERS</b>
             </a>
         </td>
     </tr>
     <tr>
         <td>
             <a href="/cart/items" style="float:right;">
-                <b>КОРЗИНА</b>
+                <b>CART</b>
             </a>
         </td>
     </tr>
     <tr>
         <td>
             <a href="/items" style="float:right;">
-                <b>ГЛАВНАЯ</b>
+                <b>HOME</b>
             </a>
         </td>
     </tr>
@@ -34,34 +34,34 @@
     <table style="width:50%;margin-left:auto;margin-right:auto;">
         <tr>
             <td>
-                <h3>Название</h3>
+                <h3>Item Name</h3>
                 <textarea rows="2" style="width: 100%;" name="itemName"
                           th:text="${item==null ? '' : item.getItemName()}"></textarea>
             </td>
         </tr>
         <tr>
             <td>
-                <h3>Изображение</h3>
-                <input type="file" name="image"></input>
+                <h3>Image</h3>
+                <input type="file" name="image"/>
             </td>
         </tr>
         <tr>
             <td>
-                <h3>Цена</h3>
+                <h3>Price</h3>
                 <textarea rows="2" style="width: 100%;" name="price"
                           th:text="${item==null ? '' : item.getPrice()}"></textarea>
             </td>
         </tr>
         <tr>
             <td>
-                <h3>Описание</h3>
+                <h3>Description</h3>
                 <textarea rows="30" style="width: 100%;" name="description"
                           th:text="${item==null ? '' : item.getDescription()}"></textarea>
             </td>
         </tr>
         <tr>
             <td>
-                <button style="float:right;" th:text="${item==null ? 'Сохранить' : 'Редактировать'}"></button>
+                <button style="float:right;" th:text="${item==null ? 'Save' : 'Edit'}"></button>
             </td>
         </tr>
     </table>

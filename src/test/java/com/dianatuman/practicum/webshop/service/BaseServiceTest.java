@@ -3,7 +3,6 @@ package com.dianatuman.practicum.webshop.service;
 import com.dianatuman.practicum.webshop.WebshopAppApplication;
 import com.dianatuman.practicum.webshop.mapper.ItemMapper;
 import com.dianatuman.practicum.webshop.repository.ItemRepository;
-import com.dianatuman.practicum.webshop.repository.OrderItemRepository;
 import com.dianatuman.practicum.webshop.repository.OrderRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,8 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.PostgreSQLContainer;
 
@@ -30,12 +28,10 @@ public class BaseServiceTest {
     protected OrderRepository orderRepository;
 
     @Autowired
-    protected OrderItemRepository orderItemRepository;
-
-    @Autowired
     protected ItemMapper itemMapper;
 
-    protected MockMvc mockMvc;
+    @Autowired
+    protected WebTestClient webTestClient;
 
     private static final PostgreSQLContainer<?> postgres;
 
@@ -56,9 +52,6 @@ public class BaseServiceTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-
-        orderItemRepository.deleteAll();
         orderRepository.deleteAll();
         itemRepository.deleteAll();
     }

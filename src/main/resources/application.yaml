@@ -1,19 +1,50 @@
-spring:
-  application:
-    name: webshop-app
-
-  servlet:
+server:
+  netty:
+    idle-timeout: 60s                     # Закрытие неактивных соединений через 60 секунд
+    connection-timeout: 30s               # Тайм-аут установки соединения
+    max-connections: 10000                # Максимальное количество одновременных соединений
+    validate-headers: true                # Проверка HTTP-заголовков
+    max-initial-line-length: 4096         # Максимальная длина начальной строки HTTP-запроса
+    max-header-size: 16384                # Максимальный размер HTTP-заголовков
+    max-chunk-size: 8192                  # Максимальный размер чанка данных
     multipart:
       max-request-size: 418018841
       max-file-size: 20848820
       file-size-threshold: 1048576
+
+spring:
+  application:
+    name: webshop-app
   
-  datasource:
-    url: jdbc:postgresql://localhost:5432/practicum
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/practicum
     username: ${DB_USER}
     password: ${DB_PASS}
-    driver-class-name: org.postgresql.Driver
-  jpa:
-    hibernate:
-      ddl-auto: update
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    pool:
+      enabled: true                               # Включение пула соединений
+      initial-size: 10                            # Начальное количество соединений в пуле
+      max-size: 50                                # Максимальное количество соединений
+      max-idle-time: 30s                          # Время бездействия соединения перед закрытием
+      max-life-time: 10m                          # Максимальное время жизни соединения
+      validation-query: SELECT 1                  # SQL-запрос для проверки работоспособности соединения
+  sql:
+    init:
+      mode: always
+
+  reactor:
+    netty:
+      worker:
+        count: 16                         # Количество рабочих потоков
+        boss-count: 4                     # Количество потоков-боссов
+        shutdown-quiet-period: 2s         # Период ожидания перед выключением
+        shutdown-timeout: 15s             # Тайм-аут выключения
+      max-connections: 8192               # Максимум соединений для клиентов Netty
+      connection-timeout: 30000           # Тайм-аут соединения в миллисекундах
+      tcp:
+        keep-alive: true                  # Включение TCP keep-alive
+      pools:
+        default:
+          metrics: true                   # Включение метрик
+          acquire-timeout: 45s            # Тайм-аут получения соединения из пула
+          max-idle-time: 30m              # Максимальное время простоя соединения в пуле
+          max-life-time: 2h               # Максимальное время жизни соединения s

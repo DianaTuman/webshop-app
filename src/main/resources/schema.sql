@@ -1,3 +1,3 @@
-insert into items(item_name, description, price) values ('Item 1', 'Proin a orci et ipsum accumsan porttitor ac non est.', 12);
-insert into items(item_name, description, price) values ('Item 2', 'Description', 234234.7);
-insert into items(item_name, description, price) values ('Test', 'Test', 1200);
+--insert into items(item_name, description, price) values ('Item 1', 'Proin a orci et ipsum accumsan porttitor ac non est.', 12);
+--insert into items(item_name, description, price) values ('Item 2', 'Description', 234234.7);
+--insert into items(item_name, description, price) values ('Test', 'Test', 1200);

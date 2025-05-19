@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import reactor.core.publisher.Mono;
 
 @Controller
 @RequestMapping("/")
@@ -18,13 +19,13 @@ public class HomeController {
     }
 
     @GetMapping
-    public String homePage() {
-        return "redirect:./items";
+    public Mono<String> homePage() {
+        return Mono.just("redirect:./items");
     }
 
     @GetMapping("/images/{id}")
     @ResponseBody
-    public byte[] getImage(@PathVariable(name = "id") long id) {
+    public Mono<byte[]> getImage(@PathVariable(name = "id") long id) {
         return itemService.getImage(id);
     }
 
