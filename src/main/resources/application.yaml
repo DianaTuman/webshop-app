@@ -1,17 +1,3 @@
-server:
-  netty:
-    idle-timeout: 60s                     # Закрытие неактивных соединений через 60 секунд
-    connection-timeout: 30s               # Тайм-аут установки соединения
-    max-connections: 10000                # Максимальное количество одновременных соединений
-    validate-headers: true                # Проверка HTTP-заголовков
-    max-initial-line-length: 4096         # Максимальная длина начальной строки HTTP-запроса
-    max-header-size: 16384                # Максимальный размер HTTP-заголовков
-    max-chunk-size: 8192                  # Максимальный размер чанка данных
-    multipart:
-      max-request-size: 418018841
-      max-file-size: 20848820
-      file-size-threshold: 1048576
-
 spring:
   application:
     name: webshop-app

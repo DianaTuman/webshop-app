@@ -56,14 +56,13 @@ public class ItemService {
     }
 
     public Mono<Item> addItem(ItemDTO itemDTO, Mono<FilePart> image) {
-        Item entity = itemMapper.toEntity(itemDTO);
         return Mono.zip(objects -> {
                             Item item = (Item) objects[0];
                             var filePart = (DataBuffer) objects[1];
                             item.setImage(filePart.toByteBuffer().array());
                             return item;
                         },
-                        itemRepository.save(entity),
+                        itemRepository.save(itemMapper.toEntity(itemDTO)),
                         image.flatMap(filePart -> DataBufferUtils.join(filePart.content())))
                 .flatMap(itemRepository::save);
     }
@@ -100,10 +99,12 @@ public class ItemService {
     public Mono<Long> createOrder() {
         return orderRepository.save(new Order())
                 .flatMapMany(order ->
-                        Flux.concat(Stream.concat(cartItems.entrySet().parallelStream().map((entry) ->
-                                        orderRepository.createNewOrderItem(order.getId(), entry.getKey(), entry.getValue())),
-                                Stream.of(Mono.just(order.getId()))
-                        ).toList()))
+                        Flux.concat(
+                                Stream.concat(
+                                        cartItems.entrySet().parallelStream().map((entry) ->
+                                                orderRepository.createNewOrderItem(order.getId(), entry.getKey(), entry.getValue())),
+                                        Stream.of(Mono.just(order.getId()))
+                                ).toList()))
                 .doOnComplete(cartItems::clear).last();
     }
 }

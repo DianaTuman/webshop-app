@@ -2,7 +2,6 @@ package com.dianatuman.practicum.webshop.controller;
 
 import com.dianatuman.practicum.webshop.dto.ItemDTO;
 import com.dianatuman.practicum.webshop.service.ItemService;
-import com.dianatuman.practicum.webshop.service.OrderService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,12 +13,9 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/cart")
 public class CartController {
 
-    private final OrderService orderService;
-
     private final ItemService itemService;
 
-    public CartController(OrderService orderService, ItemService itemService) {
-        this.orderService = orderService;
+    public CartController(ItemService itemService) {
         this.itemService = itemService;
     }
 
@@ -40,7 +36,6 @@ public class CartController {
 
     @PostMapping("/buy")
     public Mono<String> buyCart() {
-        var order = itemService.createOrder();
-        return order.map(orderId -> String.format("redirect:/orders/%s?newOrder=true", orderId));
+        return itemService.createOrder().map(orderId -> String.format("redirect:/orders/%s?newOrder=true", orderId));
     }
 }
