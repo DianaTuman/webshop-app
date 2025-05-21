@@ -1,40 +1,50 @@
-//package com.dianatuman.practicum.webshop.service;
-//
-//import com.dianatuman.practicum.webshop.dto.ItemDTO;
-//import com.dianatuman.practicum.webshop.entity.Item;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.data.domain.Page;
-//
-//import java.util.List;
-//import java.util.Objects;
-//
-//import static org.assertj.core.api.Assertions.assertThat;
-//import static org.assertj.core.api.Assertions.fail;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-//import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-//
-//public class ItemServiceTest extends BaseServiceTest {
-//
-//    @Test
-//    public void getItemsTest() throws Exception {
-//        var item1 = itemRepository.save(new Item("TestItem1", "ItemDescr", 11.0));
-//        var item2 = itemRepository.save(new Item("TestItem2", "ItemDescr", 12.0));
-//        Object modelItems = Objects.requireNonNull(mockMvc.perform(get("/items"))
-//                .andReturn().getModelAndView()).getModel().get("items");
+package com.dianatuman.practicum.webshop.service;
+
+import com.dianatuman.practicum.webshop.dto.ItemDTO;
+import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.web.reactive.function.BodyInserters;
+
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
+
+public class ItemServiceTest extends BaseServiceTest {
+
+    @Test
+    public void getItemsTest() {
+        var bodyBuilder = new MultipartBodyBuilder();
+        bodyBuilder.part("itemName", "TestItem1");
+        bodyBuilder.part("description", "description");
+        bodyBuilder.part("price", "123");
+        bodyBuilder.part("image", new byte[0], MediaType.IMAGE_PNG);
+
+        webTestClient.post().uri("/items/add")
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
+                .exchange()
+                .expectStatus()
+                .is2xxSuccessful();
+
+        webTestClient.get().uri("/items").exchange()
+                .expectStatus()
+                .is2xxSuccessful();
 //        if (modelItems instanceof Page<?>) {
 //            List<ItemDTO> items = ((Page<ItemDTO>) modelItems).toList();
 //            assertThat(items).isNotEmpty();
 //            assertThat(items).hasSize(2);
-//            assertThat(items).contains(itemMapper.toDTO(item1), itemMapper.toDTO(item2));
 //        } else {
 //            fail();
 //        }
-//    }
-//
+    }
+
 //    @Test
 //    public void getItemTest() throws Exception {
 //        var item1 = itemRepository.save(new Item("TestItem1", "ItemDescr", 11.0));
-//        ItemDTO item = (ItemDTO) Objects.requireNonNull(mockMvc.perform(get("/items/" + item1.getId()))
+//        ItemDTO item = (ItemDTO) webTestClient.get().uri("/items/" + item1.getId()).exchange()
 //                .andReturn().getModelAndView()).getModel().get("item");
 //        assertThat(item).isEqualTo(itemMapper.toDTO(item1));
 //    }
@@ -44,32 +54,57 @@
 //        var item1 = itemRepository.save(new Item("TestItem1", "ItemDescr", 11.0));
 //        String uriTemplate = "/items/" + item1.getId();
 //
-//        ItemDTO item = (ItemDTO) Objects.requireNonNull(mockMvc.perform(get(uriTemplate))
+//        ItemDTO item = (ItemDTO) webTestClient.get().uri(uriTemplate).exchange()
 //                .andReturn().getModelAndView()).getModel().get("item");
 //        assertThat(item.getCount()).isEqualTo(0);
 //
-//        mockMvc.perform(post(uriTemplate).param("action", "plus"));
-//        item = (ItemDTO) Objects.requireNonNull(mockMvc.perform(get(uriTemplate))
+//        webTestClient.post().uri(uriBuilder ->
+//                        uriBuilder
+//                                .path(uriTemplate)
+//                                .queryParam("action", "plus")
+//                                .build())
+//                .exchange();
+//        item = (ItemDTO) webTestClient.get().uri(uriTemplate).exchange()
 //                .andReturn().getModelAndView()).getModel().get("item");
 //        assertThat(item.getCount()).isEqualTo(1);
 //
-//        mockMvc.perform(post(uriTemplate).param("action", "delete"));
-//        item = (ItemDTO) Objects.requireNonNull(mockMvc.perform(get(uriTemplate))
+//        webTestClient.post().uri(uriBuilder ->
+//                        uriBuilder
+//                                .path(uriTemplate)
+//                                .queryParam("action", "delete")
+//                                .build())
+//                .exchange();
+//        item = (ItemDTO) webTestClient.get().uri(uriTemplate).exchange()
 //                .andReturn().getModelAndView()).getModel().get("item");
 //        assertThat(item.getCount()).isEqualTo(0);
 //
-//        mockMvc.perform(post(uriTemplate).param("action", "plus"));
-//        mockMvc.perform(post(uriTemplate).param("action", "plus"));
-//        item = (ItemDTO) Objects.requireNonNull(mockMvc.perform(get(uriTemplate))
+//        webTestClient.post().uri(uriBuilder ->
+//                        uriBuilder
+//                                .path(uriTemplate)
+//                                .queryParam("action", "plus")
+//                                .build())
+//                .exchange();
+//        webTestClient.post().uri(uriBuilder ->
+//                        uriBuilder
+//                                .path(uriTemplate)
+//                                .queryParam("action", "plus")
+//                                .build())
+//                .exchange();
+//        item = (ItemDTO) webTestClient.get().uri(uriTemplate).exchange()
 //                .andReturn().getModelAndView()).getModel().get("item");
 //        assertThat(item.getCount()).isEqualTo(2);
 //
-//        mockMvc.perform(post(uriTemplate).param("action", "minus"));
-//        item = (ItemDTO) Objects.requireNonNull(mockMvc.perform(get(uriTemplate))
+//        webTestClient.post().uri(uriBuilder ->
+//                        uriBuilder
+//                                .path(uriTemplate)
+//                                .queryParam("action", "minus")
+//                                .build())
+//                .exchange();
+//        item = (ItemDTO) webTestClient.get().uri(uriTemplate).exchange()
 //                .andReturn().getModelAndView()).getModel().get("item");
 //        assertThat(item.getCount()).isEqualTo(1);
 //
-//        Object modelItems = Objects.requireNonNull(mockMvc.perform(get("/cart/items"))
+//        Object modelItems = webTestClient.get().uri("/cart/items").exchange()
 //                .andReturn().getModelAndView()).getModel().get("items");
 //        if (modelItems instanceof List) {
 //            List<ItemDTO> items = (List<ItemDTO>) modelItems;
@@ -81,4 +116,4 @@
 //            fail();
 //        }
 //    }
-//}
+}

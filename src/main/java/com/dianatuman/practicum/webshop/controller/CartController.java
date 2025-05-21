@@ -1,9 +1,9 @@
 package com.dianatuman.practicum.webshop.controller;
 
 import com.dianatuman.practicum.webshop.dto.ItemDTO;
-import com.dianatuman.practicum.webshop.dto.OrderDTO;
 import com.dianatuman.practicum.webshop.service.ItemService;
 import com.dianatuman.practicum.webshop.service.OrderService;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -32,17 +32,15 @@ public class CartController {
         return Mono.just("cart");
     }
 
-    @PostMapping("/items/{itemId}")
-    public Mono<String> setItemCartCount(@PathVariable long itemId, @RequestParam String action) {
+    @PostMapping(path = "/items/{itemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public Mono<String> setItemCartCount(@PathVariable long itemId, @RequestPart("action") String action) {
         itemService.setItemCartCount(itemId, action);
         return Mono.just("redirect:/cart/items");
     }
 
     @PostMapping("/buy")
-    public Mono<String> buyCart(Model model) {
-        var order = orderService.createOrder(itemService.getCartItems());
-        itemService.clearCart();
-        model.addAttribute("order", order);
-        return Mono.just(String.format("redirect:/orders/%s?newOrder=true", order.map(OrderDTO::getId).block()));
+    public Mono<String> buyCart() {
+        var order = itemService.createOrder();
+        return order.map(orderId -> String.format("redirect:/orders/%s?newOrder=true", orderId));
     }
 }

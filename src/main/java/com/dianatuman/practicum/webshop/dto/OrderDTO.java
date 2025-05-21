@@ -2,23 +2,23 @@ package com.dianatuman.practicum.webshop.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NonNull;
 import lombok.ToString;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Objects;
 
 @Data
 @AllArgsConstructor
 @ToString
-public class OrderDTO {
+public class OrderDTO implements Comparable {
 
     private Long id;
 
-    private Flux<ItemDTO> items;
+    private List<ItemDTO> items;
 
-    public Mono<Double> getTotalSum() {
-        return items.map(item -> item.getPrice() * item.getCount()).reduce(0.0, Double::sum);
+    public double getTotalSum() {
+        return items.stream().map(item -> item.getPrice() * item.getCount()).reduce(0.0, Double::sum);
     }
 
     @Override
@@ -31,5 +31,14 @@ public class OrderDTO {
     @Override
     public int hashCode() {
         return Objects.hash(id, items);
+    }
+
+    @Override
+    public int compareTo(@NonNull Object o) {
+        if (o instanceof OrderDTO) {
+            return this.id.compareTo(((OrderDTO) o).id);
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
 }

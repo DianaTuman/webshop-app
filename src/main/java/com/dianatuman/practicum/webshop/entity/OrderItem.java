@@ -7,8 +7,15 @@ import lombok.Data;
 @AllArgsConstructor
 public class OrderItem {
 
-    Item item;
+    private Long id;
 
-    int count;
+    private String itemName;
+
+    private String description;
+
+    private Double price;
+
+    private int count;
+
 }
 

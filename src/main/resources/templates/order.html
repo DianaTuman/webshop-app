@@ -51,7 +51,7 @@
                         <b th:text="${item.getItemName()}"></b>
                     </td>
                     <td>
-                        <b th:text="x ${item.getCount()}+''"></b>
+                        <b th:text="${ 'x ' + item.getCount()}"></b>
                     </td>
                     <td>
                         <b th:text="${item.getPrice()*item.getCount()}+' $'"></b>

@@ -1,25 +1,21 @@
 package com.dianatuman.practicum.webshop.service;
 
-import com.dianatuman.practicum.webshop.WebshopAppApplication;
 import com.dianatuman.practicum.webshop.mapper.ItemMapper;
 import com.dianatuman.practicum.webshop.repository.ItemRepository;
 import com.dianatuman.practicum.webshop.repository.OrderRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-@SpringBootTest(classes = WebshopAppApplication.class)
+@Testcontainers
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 public class BaseServiceTest {
-
-    @Autowired
-    private WebApplicationContext webApplicationContext;
 
     @Autowired
     protected ItemRepository itemRepository;
@@ -33,26 +29,7 @@ public class BaseServiceTest {
     @Autowired
     protected WebTestClient webTestClient;
 
-    private static final PostgreSQLContainer<?> postgres;
-
-    static {
-        postgres = new PostgreSQLContainer<>("postgres:17")
-                .withDatabaseName("testdb")
-                .withUsername("junit")
-                .withPassword("junit");
-        postgres.start();
-    }
-
-    @DynamicPropertySource
-    static void registerProperties(DynamicPropertyRegistry registry) {
-        registry.add("spring.datasource.url", postgres::getJdbcUrl);
-        registry.add("spring.datasource.username", postgres::getUsername);
-        registry.add("spring.datasource.password", postgres::getPassword);
-    }
-
-    @BeforeEach
-    void setUp() {
-        orderRepository.deleteAll();
-        itemRepository.deleteAll();
-    }
+    @Container
+    @ServiceConnection
+    private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17");
 }

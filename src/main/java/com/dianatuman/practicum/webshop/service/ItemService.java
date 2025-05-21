@@ -2,37 +2,46 @@ package com.dianatuman.practicum.webshop.service;
 
 import com.dianatuman.practicum.webshop.dto.ItemDTO;
 import com.dianatuman.practicum.webshop.entity.Item;
+import com.dianatuman.practicum.webshop.entity.Order;
 import com.dianatuman.practicum.webshop.mapper.ItemMapper;
 import com.dianatuman.practicum.webshop.repository.ItemRepository;
+import com.dianatuman.practicum.webshop.repository.OrderRepository;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 @Service
 public class ItemService {
 
     private final ItemMapper itemMapper;
     private final ItemRepository itemRepository;
+    private final OrderRepository orderRepository;
 
     private final Map<Long, Integer> cartItems = new HashMap<>();
 
-    public ItemService(ItemMapper itemMapper, ItemRepository itemRepository) {
+    public ItemService(ItemMapper itemMapper, ItemRepository itemRepository, OrderRepository orderRepository) {
         this.itemMapper = itemMapper;
         this.itemRepository = itemRepository;
+        this.orderRepository = orderRepository;
     }
 
     public Mono<byte[]> getImage(long itemId) {
         return itemRepository.findById(itemId).map(Item::getImage);
     }
 
-    public Mono<Page<ItemDTO>> getItems(String search, Pageable pageRequest) {
-        return itemRepository.findByItemNameContainingIgnoreCase(search)
+    public Mono<Page<ItemDTO>> getItems(String search, Pageable pageRequest, Sort sort) {
+        return itemRepository.findByItemNameContainingIgnoreCase(search, sort)
                 .map(itemMapper::toDTO).map(this::setCount)
                 .collectList()
                 .map(items -> {
@@ -46,19 +55,17 @@ public class ItemService {
         return itemRepository.findById(itemId).map(itemMapper::toDTO).map(this::setCount);
     }
 
-    public void addItem(ItemDTO itemDTO, byte[] bytes) {
+    public Mono<Item> addItem(ItemDTO itemDTO, Mono<FilePart> image) {
         Item entity = itemMapper.toEntity(itemDTO);
-        entity.setImage(bytes);
-        itemRepository.save(entity);
-    }
-
-    public void editItem(long itemId, ItemDTO itemDTO, byte[] bytes) {
-        itemDTO.setId(itemId);
-        Item entity = itemMapper.toEntity(itemDTO);
-        if (bytes != null) {
-            entity.setImage(bytes);
-        }
-        itemRepository.save(entity);
+        return Mono.zip(objects -> {
+                            Item item = (Item) objects[0];
+                            var filePart = (DataBuffer) objects[1];
+                            item.setImage(filePart.toByteBuffer().array());
+                            return item;
+                        },
+                        itemRepository.save(entity),
+                        image.flatMap(filePart -> DataBufferUtils.join(filePart.content())))
+                .flatMap(itemRepository::save);
     }
 
     public void setItemCartCount(long itemId, String action) {
@@ -83,14 +90,20 @@ public class ItemService {
                 .map(itemMapper::toDTO).map(this::setCount);
     }
 
-    public void clearCart() {
-        cartItems.clear();
-    }
-
     private ItemDTO setCount(ItemDTO dto) {
         if (cartItems.containsKey(dto.getId())) {
             dto.setCount(cartItems.get(dto.getId()));
         }
         return dto;
+    }
+
+    public Mono<Long> createOrder() {
+        return orderRepository.save(new Order())
+                .flatMapMany(order ->
+                        Flux.concat(Stream.concat(cartItems.entrySet().parallelStream().map((entry) ->
+                                        orderRepository.createNewOrderItem(order.getId(), entry.getKey(), entry.getValue())),
+                                Stream.of(Mono.just(order.getId()))
+                        ).toList()))
+                .doOnComplete(cartItems::clear).last();
     }
 }

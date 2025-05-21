@@ -83,7 +83,7 @@
                 </tr>
                 <tr>
                     <td>
-                        <form th:action="${'/items/'+item.getId()}" method="post">
+                        <form th:action="${'/items/'+item.getId()}" method="post" enctype="multipart/form-data">
                             <button name="action" value="minus">-</button>
                             <span th:text="${item.getCount()}"></span>
                             <button name="action" value="plus">+</button>

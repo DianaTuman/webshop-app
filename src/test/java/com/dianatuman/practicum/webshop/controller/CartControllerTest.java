@@ -13,7 +13,7 @@ public class CartControllerTest extends BaseControllerTest {
 
     @Test
     public void getCartItems_shouldReturnCartPage() throws Exception {
-        ItemDTO e1 = new ItemDTO("TestItem", "Item Description", 10.0, new byte[0]);
+        ItemDTO e1 = new ItemDTO("TestItem", "Item Description", 10.0);
         e1.setId(1L);
         e1.setCount(2);
         when(itemService.getCartItems()).thenReturn(Flux.just(e1));
