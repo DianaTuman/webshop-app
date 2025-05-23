@@ -13,8 +13,7 @@ The application will start at **localhost:8080**.
 ### **To run this application without Docker:**
 
 * **PostgreSQL** must be installed and running at **localhost:5432**.
-  Environment variables **'DB_USER'** and **'DB_PASS'** must be set for accessing database and a schema named *
-  *practicum** must exist in database.
+  Environment variables **'DB_USER'** and **'DB_PASS'** must be set for accessing database and a schema named **practicum** must exist in database.
 * **gradle bootRun** command to run application
 
 ### **To run this application with Docker:**
