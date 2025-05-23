@@ -17,7 +17,7 @@ import static org.mockito.Mockito.*;
 public class ItemControllerTest extends BaseControllerTest {
 
     @Test
-    public void getItems_shouldReturnItemsPage() throws Exception {
+    public void getItems_shouldReturnItemsPage() {
         ItemDTO e1 = new ItemDTO("TestItem", "Item Description", 10.0);
         e1.setId(1L);
         Page<ItemDTO> pagedListHolder = new PageImpl<>(List.of(e1), PageRequest.of(0, 10), 1);
@@ -34,7 +34,7 @@ public class ItemControllerTest extends BaseControllerTest {
     }
 
     @Test
-    public void getItemId_shouldReturnItemPage() throws Exception {
+    public void getItemId_shouldReturnItemPage() {
         ItemDTO e1 = new ItemDTO("TestItem", "Item Description", 10.0);
         e1.setId(1L);
         when(itemService.getItem(1)).thenReturn(Mono.just(e1));

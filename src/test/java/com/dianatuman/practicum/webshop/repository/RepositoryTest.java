@@ -30,16 +30,16 @@ public class RepositoryTest {
     @Test
     public void findItemByItemNameTest() {
         var item1 = new Item("TestItem", "Desc", 11.0);
-        var item2 =new Item("ItemName", "Desc", 11.0);
+        var item2 = new Item("ItemName", "Desc", 11.0);
 
         Iterable<Item> test = itemRepository.saveAll(List.of(item1, item2))
-                .thenMany(itemRepository.findByItemNameContainingIgnoreCase("test", Sort.unsorted()))
+                .thenMany(itemRepository.findByItemNameContainingIgnoreCase("TestItem", Sort.unsorted()))
                 .toIterable();
 
         assertThat(test)
                 .isNotEmpty()
                 .hasSize(1)
                 .first()
-                        .extracting(Item::getItemName).isEqualTo(item1.getItemName());
+                .extracting(Item::getItemName).isEqualTo(item1.getItemName());
     }
 }

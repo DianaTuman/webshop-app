@@ -12,7 +12,7 @@ import static org.mockito.Mockito.*;
 public class CartControllerTest extends BaseControllerTest {
 
     @Test
-    public void getCartItems_shouldReturnCartPage() throws Exception {
+    public void getCartItems_shouldReturnCartPage() {
         ItemDTO e1 = new ItemDTO("TestItem", "Item Description", 10.0);
         e1.setId(1L);
         e1.setCount(2);
