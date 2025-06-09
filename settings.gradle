@@ -1,1 +1,3 @@
 rootProject.name = 'webshop-app'
+include 'main-app'
+include 'payment-app'

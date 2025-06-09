@@ -8,14 +8,19 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - db
+      - db-postgres
+      - db-redis
     environment:
       - 'SPRING_R2DBC_URL=r2dbc:postgresql://db:5432/postgres'
       - 'SPRING_R2DBC_USERNAME=compose-postgres'
       - 'SPRING_R2DBC_PASSWORD=compose-postgres'
-  db:
+
+  db-postgres:
     image: 'postgres:17'
     restart: always
     environment:
       - POSTGRES_USER=compose-postgres
       - POSTGRES_PASSWORD=compose-postgres
+
+  db-redis:
+    image: 'redis:7.4.2-bookworm'

@@ -1,0 +1,21 @@
+plugins {
+    id "org.openapi.generator" version "7.12.0"
+}
+
+dependencies {
+}
+
+
+openApiGenerate {
+    generatorName.set("spring")
+    inputSpec.set("$projectDir/src/main/resources/api-spec.yaml")
+    outputDir.set("$projectDir/build/generated")
+    modelPackage.set("com.dianatuman.practicum.domain")
+    apiPackage.set("com.dianatuman.practicum.api")
+    configOptions.set([
+            sourceFolder : "src/gen/java/main/codegen",
+            interfaceOnly: "false",
+            library      : "spring-boot",
+            useTags      : "true"
+    ])
+}
