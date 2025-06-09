@@ -6,11 +6,9 @@ import com.dianatuman.practicum.webshop.entity.Order;
 import com.dianatuman.practicum.webshop.mapper.ItemMapper;
 import com.dianatuman.practicum.webshop.repository.ItemRepository;
 import com.dianatuman.practicum.webshop.repository.OrderRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
@@ -19,6 +17,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 @Service
@@ -40,19 +39,21 @@ public class ItemService {
         return itemRepository.findById(itemId).map(Item::getImage);
     }
 
-    public Mono<Page<ItemDTO>> getItems(String search, Pageable pageRequest, Sort sort) {
+    public Flux<ItemDTO> getItems(String search, Sort sort) {
         return itemRepository.findByItemNameContainingIgnoreCase(search, sort)
-                .map(itemMapper::toDTO).map(this::setCount)
-                .collectList()
-                .map(items -> {
-                    final int start = (int) pageRequest.getOffset();
-                    final int end = Math.min((start + pageRequest.getPageSize()), items.size());
-                    return new PageImpl<>(items.subList(start, end), pageRequest, items.size());
-                });
+                .map(itemMapper::toDTO);
     }
 
+    @Cacheable(value = "itemsIds")
+    public Flux<Long> getItemsIds(String search, Sort sort) {
+        System.out.println("CACHING itemsIds " + search + " " + sort.toString());
+        return itemRepository.findIdByItemNameContainingIgnoreCase(search, sort);
+    }
+
+    @Cacheable(value = "item", key = "#itemId")
     public Mono<ItemDTO> getItem(long itemId) {
-        return itemRepository.findById(itemId).map(itemMapper::toDTO).map(this::setCount);
+        System.out.println("CACHING " + itemId);
+        return itemRepository.findById(itemId).map(itemMapper::toDTO);
     }
 
     public Mono<Item> addItem(ItemDTO itemDTO, Mono<FilePart> image) {
@@ -84,12 +85,11 @@ public class ItemService {
         }
     }
 
-    public Flux<ItemDTO> getCartItems() {
-        return itemRepository.findAllById(cartItems.keySet())
-                .map(itemMapper::toDTO).map(this::setCount);
+    public Set<Long> getCartItems() {
+        return cartItems.keySet();
     }
 
-    private ItemDTO setCount(ItemDTO dto) {
+    public ItemDTO setCount(ItemDTO dto) {
         if (cartItems.containsKey(dto.getId())) {
             dto.setCount(cartItems.get(dto.getId()));
         }

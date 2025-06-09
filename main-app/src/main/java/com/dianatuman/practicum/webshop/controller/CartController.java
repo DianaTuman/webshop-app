@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.Set;
+
 @Controller
 @RequestMapping("/cart")
 public class CartController {
@@ -21,7 +23,9 @@ public class CartController {
 
     @GetMapping("/items")
     public Mono<String> getCartItems(Model model) {
-        Flux<ItemDTO> cartItems = itemService.getCartItems();
+        Set<Long> cartItemsIds = itemService.getCartItems();
+        Flux<ItemDTO> cartItems = Flux.concat(cartItemsIds.stream().map(itemService::getItem).toList())
+                .map(itemService::setCount);
         model.addAttribute("items", cartItems.collectList());
         model.addAttribute("total",
                 cartItems.map(item -> item.getPrice() * item.getCount()).reduce(0.0, Double::sum));

@@ -2,13 +2,11 @@ spring:
   application:
     name: webshop-main-app
 
-  data:
-    redis:
-      host: redis-single.node
-      port: 6379
+  cache:
     cache:
-      redis:
-        time-to-live: PT5M    # TTL по умолчанию для кешей
+      type: redis
+      host: localhost
+      port: 6379
   
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/practicum

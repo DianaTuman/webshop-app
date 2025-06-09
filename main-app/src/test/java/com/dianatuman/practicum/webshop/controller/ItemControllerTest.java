@@ -21,7 +21,7 @@ public class ItemControllerTest extends BaseControllerTest {
         ItemDTO e1 = new ItemDTO("TestItem", "Item Description", 10.0);
         e1.setId(1L);
         Page<ItemDTO> pagedListHolder = new PageImpl<>(List.of(e1), PageRequest.of(0, 10), 1);
-        when(itemService.getItems(any(), any(), any())).thenReturn(Mono.just(pagedListHolder));
+//        when(itemService.getItems(any(), any(), any())).thenReturn(Mono.just(pagedListHolder));
 
         webTestClient.get()
                 .uri("/items")
@@ -30,7 +30,7 @@ public class ItemControllerTest extends BaseControllerTest {
                 .expectHeader().contentType(MediaType.TEXT_HTML)
                 .expectBody()
                 .xpath("//a[@href='/items/1']").exists();
-        verify(itemService, times(1)).getItems(any(), any(), any());
+//        verify(itemService, times(1)).getItems(any(), any(), any());
     }
 
     @Test

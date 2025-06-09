@@ -10,4 +10,6 @@ import reactor.core.publisher.Flux;
 public interface ItemRepository extends R2dbcRepository<Item, Long> {
 
     Flux<Item> findByItemNameContainingIgnoreCase(String itemName, Sort sort);
+
+    Flux<Long> findIdByItemNameContainingIgnoreCase(String itemName, Sort sort);
 }

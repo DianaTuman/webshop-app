@@ -2,7 +2,9 @@ package com.dianatuman.practicum.webshop.controller;
 
 import com.dianatuman.practicum.webshop.dto.ItemDTO;
 import com.dianatuman.practicum.webshop.service.ItemService;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.multipart.FilePart;
@@ -26,19 +28,27 @@ public class ItemsController {
                                  @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                  @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
                                  @RequestParam(name = "sort", defaultValue = "") String sort) {
-        var items = itemService.getItems(search,
-                PageRequest.of(pageNumber, pageSize), sort.isEmpty() ? Sort.unsorted() : Sort.by(sort).ascending());
+        Pageable pageRequest = PageRequest.of(pageNumber, pageSize);
+        var itemsIds = itemService.getItemsIds(search, sort.isEmpty() ? Sort.unsorted() : Sort.by(sort).ascending());
+        var itemsPage = itemsIds.flatMap(itemService::getItem)
+                .map(itemService::setCount)
+                .collectList()
+                .map(items -> {
+                    final int start = (int) pageRequest.getOffset();
+                    final int end = Math.min((start + pageRequest.getPageSize()), items.size());
+                    return new PageImpl<>(items.subList(start, end), pageRequest, items.size());
+                });
         model.addAttribute("search", search);
         model.addAttribute("sort", sort);
         model.addAttribute("pageSize", pageSize);
         model.addAttribute("pageNumber", pageNumber);
-        model.addAttribute("items", items);
+        model.addAttribute("items", itemsPage);
         return Mono.just("items");
     }
 
     @GetMapping("/{id}")
     public Mono<String> getItem(@PathVariable(name = "id") long id, Model model) {
-        model.addAttribute("item", itemService.getItem(id));
+        model.addAttribute("item", itemService.getItem(id).map(itemService::setCount));
         return Mono.just("item");
     }
 

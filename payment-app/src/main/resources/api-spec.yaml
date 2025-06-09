@@ -1,0 +1,40 @@
+openapi: 3.0.4
+
+info:
+  title: Payment API
+  version: 1.0.0
+
+paths:
+  /balance:
+    get:
+      summary: Get user balance
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: number
+                format: double
+    put:
+      summary: Update balance
+      requestBody:
+        description: Optional description in *Markdown*
+        required: true
+        content:
+          application/json:
+            schema:
+              type: number
+              format: double
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: number
+                format: double
+        '4XX':
+          description: User Error
+        '5XX':
+          description: Server Error

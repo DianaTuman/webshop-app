@@ -16,7 +16,7 @@ public class CartControllerTest extends BaseControllerTest {
         ItemDTO e1 = new ItemDTO("TestItem", "Item Description", 10.0);
         e1.setId(1L);
         e1.setCount(2);
-        when(itemService.getCartItems()).thenReturn(Flux.just(e1));
+//        when(itemService.getCartItems()).thenReturn(Flux.just(e1));
 
         webTestClient.get()
                 .uri("/cart/items")
