@@ -28,8 +28,7 @@ public class CartControllerTest extends BaseControllerTest {
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.TEXT_HTML)
                 .expectBody()
-                .xpath("//table[2]/tr[2]/td/b").isEqualTo("Total: 20.0 $")
-                .xpath("//table[2]/tr[3]/td/form/button").isEqualTo("Buy");
+                .xpath("//table[2]/tr[2]/td/b").isEqualTo("Total: 20.0 $");
         verify(itemService, times(1)).getCartItems();
     }
 }

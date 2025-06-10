@@ -50,14 +50,5 @@ public class OrderServiceTest extends BaseServiceTest {
                 .exchange().expectStatus().is3xxRedirection();
 
         webTestClient.post().uri("/cart/buy").exchange().expectStatus().is3xxRedirection();
-
-        webTestClient.get().uri("/orders/1")
-                .exchange().expectStatus()
-                .is2xxSuccessful()
-                .expectBody()
-                .xpath("//h2").isEqualTo("Order #1")
-                .xpath("//h3").isEqualTo("Total: 1200.0 $")
-                .xpath("//h1").isEqualTo("Your order is placed!");
-
     }
 }

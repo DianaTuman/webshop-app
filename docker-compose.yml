@@ -1,24 +1,25 @@
-version: '4.40.0'
-
 services:
   main-app:
     build:
       context: ./main-app
-      dockerfile: main-app/Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "8080:8080"
     depends_on:
       - db-postgres
-      - db-redis
+      - payment-app
+      - cache-redis
     environment:
-      - 'SPRING_R2DBC_URL=r2dbc:postgresql://db:5432/postgres'
+      - 'SPRING_R2DBC_URL=r2dbc:postgresql://db-postgres:5432/postgres'
       - 'SPRING_R2DBC_USERNAME=compose-postgres'
       - 'SPRING_R2DBC_PASSWORD=compose-postgres'
+      - 'SPRING_DATA_REDIS_HOST=cache-redis'
+      - 'PAYMENT_SERVICE=http://payment-app:8081'
 
   payment-app:
     build:
       context: ./payment-app
-      dockerfile: payment-app/Dockerfile
+      dockerfile: Dockerfile
     ports:
       - "8081:8081"
 
@@ -29,5 +30,6 @@ services:
       - POSTGRES_USER=compose-postgres
       - POSTGRES_PASSWORD=compose-postgres
 
-  db-redis:
+  cache-redis:
     image: 'redis:7.4.2-bookworm'
+    restart: always

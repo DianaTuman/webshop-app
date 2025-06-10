@@ -20,11 +20,16 @@ public class CartController {
 
     private final WebClient paymentClient;
 
-    private Mono<Double> cartTotal;
+    private Mono<Double> cartTotal = Mono.just(0.0);
+    String paymentService;
 
     public CartController(ItemService itemService) {
         this.itemService = itemService;
-        paymentClient = WebClient.create("http://localhost:8081");
+        paymentService = System.getenv("PAYMENT_SERVICE");
+        if (paymentService == null || paymentService.isEmpty()) {
+            paymentService = "http://localhost:8081";
+        }
+        paymentClient = WebClient.create(paymentService);
     }
 
     @GetMapping("/items")

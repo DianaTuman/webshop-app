@@ -3,10 +3,7 @@ spring:
     name: webshop-main-app
 
   cache:
-    cache:
-      type: redis
-      host: localhost
-      port: 6379
+    type: redis
   
   r2dbc:
     url: r2dbc:postgresql://localhost:5432/practicum

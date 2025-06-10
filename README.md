@@ -24,5 +24,5 @@ The application will start at **localhost:8080**. The payment REST-service will 
 
 **Docker** must be installed and running
 
-1. **gradle clean bootJar** command to create a jar
-2. **docker-compose up --build** command to run the jar inside the docker container
+1. **gradle clean buildAll** command to create a jars
+2. **docker-compose up --build** command to run the jars inside the docker container
