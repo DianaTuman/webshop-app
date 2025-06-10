@@ -62,7 +62,8 @@
     </tr>
     <tr>
         <td style="text-align:right">
-            <form action="/cart/buy" method="post" th:if="${!items.isEmpty()}">
+            <h1 style="text-align:center" th:if="${!canOrder}">Payment Service is unavailable or not enough money.</h1>
+            <form th:if="${canOrder && !items.isEmpty()}" action="/cart/buy" method="post">
                 <button>Buy</button>
             </form>
         </td>

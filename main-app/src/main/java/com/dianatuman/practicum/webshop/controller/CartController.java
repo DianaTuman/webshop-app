@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -17,8 +18,13 @@ public class CartController {
 
     private final ItemService itemService;
 
+    private final WebClient paymentClient;
+
+    private Mono<Double> cartTotal;
+
     public CartController(ItemService itemService) {
         this.itemService = itemService;
+        paymentClient = WebClient.create("http://localhost:8081");
     }
 
     @GetMapping("/items")
@@ -27,8 +33,13 @@ public class CartController {
         Flux<ItemDTO> cartItems = Flux.concat(cartItemsIds.stream().map(itemService::getItem).toList())
                 .map(itemService::setCount);
         model.addAttribute("items", cartItems.collectList());
-        model.addAttribute("total",
-                cartItems.map(item -> item.getPrice() * item.getCount()).reduce(0.0, Double::sum));
+        cartTotal = cartItems.map(item -> item.getPrice() * item.getCount()).reduce(0.0, Double::sum);
+        Mono<Double> balance = paymentClient.get().uri("/balance").retrieve().bodyToMono(Double.class)
+                .onErrorReturn(-1.0);
+        Mono<Boolean> canOrder = Mono.zip(cartTotal, balance)
+                .map(((orderTotal) -> (orderTotal.getT2() >= orderTotal.getT1())));
+        model.addAttribute("canOrder", canOrder);
+        model.addAttribute("total", cartTotal);
         return Mono.just("cart");
     }
 
@@ -40,6 +51,11 @@ public class CartController {
 
     @PostMapping("/buy")
     public Mono<String> buyCart() {
-        return itemService.createOrder().map(orderId -> String.format("redirect:/orders/%s?newOrder=true", orderId));
+        return paymentClient.put().uri("/balance")
+                .body(cartTotal, Double.class)
+                .retrieve().toBodilessEntity()
+                .flatMap(response ->
+                        itemService.createOrder().map(orderId -> String.format("redirect:/orders/%s?newOrder=true", orderId)))
+                .onErrorReturn("redirect:/cart/items?failed=true");
     }
 }

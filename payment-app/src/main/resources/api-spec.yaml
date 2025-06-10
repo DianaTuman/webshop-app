@@ -17,9 +17,8 @@ paths:
                 type: number
                 format: double
     put:
-      summary: Update balance
+      summary: Charge user balance
       requestBody:
-        description: Optional description in *Markdown*
         required: true
         content:
           application/json:
@@ -29,11 +28,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            application/json:
-              schema:
-                type: number
-                format: double
         '4XX':
           description: User Error
         '5XX':

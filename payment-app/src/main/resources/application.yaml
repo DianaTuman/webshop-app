@@ -1,3 +1,6 @@
 spring:
   application:
     name: webshop-payment-app
+
+server:
+  port: 8081
