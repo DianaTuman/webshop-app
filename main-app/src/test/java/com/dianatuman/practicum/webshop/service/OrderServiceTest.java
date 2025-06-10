@@ -1,19 +1,25 @@
 package com.dianatuman.practicum.webshop.service;
 
+import com.redis.testcontainers.RedisContainer;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.utility.DockerImageName;
 
 // The DB will be prefilled with the data from the data.sql script
-
 public class OrderServiceTest extends BaseServiceTest {
 
     @Container
     @ServiceConnection
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17");
+
+    @Container
+    @ServiceConnection
+    static final RedisContainer redisContainer =
+            new RedisContainer(DockerImageName.parse("redis:7.4.2-bookworm"));
 
     @Test
     public void getOrdersTest() {

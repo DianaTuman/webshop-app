@@ -4,7 +4,9 @@ import com.dianatuman.practicum.webshop.dto.ItemDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.http.MediaType;
-import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.Set;
 
 import static org.mockito.Mockito.*;
 
@@ -16,7 +18,9 @@ public class CartControllerTest extends BaseControllerTest {
         ItemDTO e1 = new ItemDTO("TestItem", "Item Description", 10.0);
         e1.setId(1L);
         e1.setCount(2);
-//        when(itemService.getCartItems()).thenReturn(Flux.just(e1));
+        when(itemService.getCartItems()).thenReturn(Set.of(1L));
+        when(itemService.getItem(1L)).thenReturn(Mono.just(e1));
+        when(itemService.setCount(e1)).thenReturn(e1);
 
         webTestClient.get()
                 .uri("/cart/items")
