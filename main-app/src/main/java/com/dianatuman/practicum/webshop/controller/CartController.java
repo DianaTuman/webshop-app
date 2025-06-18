@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
 import java.util.Set;
 
 @Controller
@@ -33,10 +34,10 @@ public class CartController {
     }
 
     @GetMapping("/items")
-    public Mono<String> getCartItems(Model model) {
-        Set<Long> cartItemsIds = itemService.getCartItems();
+    public Mono<String> getCartItems(Model model, Principal principal) {
+        Set<Long> cartItemsIds = itemService.getCartItems(principal.getName());
         Flux<ItemDTO> cartItems = Flux.concat(cartItemsIds.stream().map(itemService::getItem).toList())
-                .map(itemService::setCount);
+                .map(itemDTO -> itemService.setCount(itemDTO, principal.getName()));
         model.addAttribute("items", cartItems.collectList());
         cartTotal = cartItems.map(item -> item.getPrice() * item.getCount()).reduce(0.0, Double::sum);
         Mono<Double> balance = paymentClient.get().uri("/balance").retrieve().bodyToMono(Double.class)
@@ -49,18 +50,19 @@ public class CartController {
     }
 
     @PostMapping(path = "/items/{itemId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Mono<String> setItemCartCount(@PathVariable long itemId, @RequestPart("action") String action) {
-        itemService.setItemCartCount(itemId, action);
+    public Mono<String> setItemCartCount(Principal principal, @PathVariable long itemId, @RequestPart("action") String action) {
+        itemService.setItemCartCount(itemId, action, principal.getName());
         return Mono.just("redirect:/cart/items");
     }
 
     @PostMapping("/buy")
-    public Mono<String> buyCart() {
+    public Mono<String> buyCart(Principal principal) {
         return paymentClient.put().uri("/balance")
                 .body(cartTotal, Double.class)
                 .retrieve().toBodilessEntity()
                 .flatMap(response ->
-                        itemService.createOrder().map(orderId -> String.format("redirect:/orders/%s?newOrder=true", orderId)))
+                        itemService.createOrder(principal.getName())
+                                .map(orderId -> String.format("redirect:/orders/%s?newOrder=true", orderId)))
                 .onErrorReturn("redirect:/cart/items?failed=true");
     }
 }

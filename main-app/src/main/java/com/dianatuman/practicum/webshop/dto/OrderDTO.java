@@ -17,6 +17,8 @@ public class OrderDTO implements Comparable {
 
     private List<ItemDTO> items;
 
+    private String username;
+
     public double getTotalSum() {
         return items.stream().map(item -> item.getPrice() * item.getCount()).reduce(0.0, Double::sum);
     }

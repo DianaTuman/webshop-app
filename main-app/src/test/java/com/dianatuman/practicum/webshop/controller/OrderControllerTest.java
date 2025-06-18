@@ -17,7 +17,7 @@ public class OrderControllerTest extends BaseControllerTest {
 
     @Test
     public void getOrders_shouldReturnOrdersPage() {
-        when(orderService.getOrders()).thenReturn(Flux.just(new OrderDTO(1L, List.of())));
+        when(orderService.getOrdersByUsername("user")).thenReturn(Flux.just(new OrderDTO(1L, List.of(), "user")));
         webTestClient.get()
                 .uri("/orders")
                 .exchange()
@@ -26,7 +26,7 @@ public class OrderControllerTest extends BaseControllerTest {
                 .expectBody()
                 .xpath("//h2/a").isEqualTo("Order #1")
                 .xpath("//a[@href='/orders/1?newOrder=false']").exists();
-        verify(orderService, times(1)).getOrders();
+        verify(orderService, times(1)).getOrdersByUsername("user");
     }
 
     @Test
@@ -35,7 +35,7 @@ public class OrderControllerTest extends BaseControllerTest {
         ItemDTO e2 = new ItemDTO("TestItem2", "Item Descr", 12.0);
         e1.setCount(1);
         e2.setCount(1);
-        when(orderService.getOrder(1)).thenReturn(Mono.just(new OrderDTO(1L, List.of(e1, e2))));
+        when(orderService.getOrderForUser(1, "user")).thenReturn(Mono.just(new OrderDTO(1L, List.of(e1, e2), "user")));
 
         webTestClient.get()
                 .uri("/orders/1")
@@ -45,6 +45,6 @@ public class OrderControllerTest extends BaseControllerTest {
                 .expectBody()
                 .xpath("//h2").isEqualTo("Order #1")
                 .xpath("//h3").isEqualTo("Total: 22.0 $");
-        verify(orderService, times(1)).getOrder(1);
+        verify(orderService, times(1)).getOrderForUser(1, "user");
     }
 }

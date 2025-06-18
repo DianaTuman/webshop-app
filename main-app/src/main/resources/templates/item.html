@@ -1,34 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/1999/xhtml">
 
 <head>
     <title>Web Shop</title>
 </head>
 
 <body>
-<table style="width:70%;margin-left:auto;margin-right:auto;">
-    <tr>
-        <td>
-            <a href="/orders" style="float:right;">
-                <b>ORDERS</b>
-            </a>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href="/cart/items" style="float:right;">
-                <b>CART</b>
-            </a>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href="/items" style="float:right;">
-                <b>HOME</b>
-            </a>
-        </td>
-    </tr>
-</table>
+<header th:insert="header.html :: header"></header>
 <div style="width:70%;margin-left:auto;margin-right:auto;">
     <p>
         <img width="300" height="300" th:src="${'http://localhost:8080/images/'+item.getId()}"/>
@@ -40,7 +18,8 @@
     <p>
         <span th:text="${item.getDescription()}"></span>
     </p>
-    <form th:action="${'/items/'+item.getId()}" method="post" enctype="multipart/form-data">
+    <form sec:authorize="isAuthenticated()" th:action="${'/items/'+item.getId()}" method="post"
+          enctype="multipart/form-data">
         <button name="action" value="minus">-</button>
         <span th:text="${item.getCount()}"></span>
         <button name="action" value="plus">+</button>

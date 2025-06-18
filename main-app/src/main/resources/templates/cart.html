@@ -6,22 +6,7 @@
 </head>
 
 <body>
-<table style="width:70%;margin-left:auto;margin-right:auto;">
-    <tr>
-        <td>
-            <a href="/orders" style="float:right;">
-                <b>Orders</b>
-            </a>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href="/items" style="float:right;">
-                <b>Home</b>
-            </a>
-        </td>
-    </tr>
-</table>
+<header th:insert="header.html :: header"> </header>
 <table style="width:70%;margin-left:auto;margin-right:auto;">
     <tr th:each="item : ${items}">
         <td>

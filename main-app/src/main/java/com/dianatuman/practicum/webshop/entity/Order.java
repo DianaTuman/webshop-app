@@ -11,4 +11,9 @@ public class Order {
     @Id
     private Long id;
 
+    private String username;
+
+    public Order(String username) {
+        this.username = username;
+    }
 }

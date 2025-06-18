@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/orders")
 public class OrdersController {
@@ -19,14 +21,14 @@ public class OrdersController {
     }
 
     @GetMapping
-    public Mono<String> getOrders(Model model) {
-        model.addAttribute("orders", orderService.getOrders());
+    public Mono<String> getOrders(Principal principal, Model model) {
+        model.addAttribute("orders", orderService.getOrdersByUsername(principal.getName()));
         return Mono.just("orders");
     }
 
     @GetMapping("/{id}")
-    public Mono<String> getOrder(@PathVariable long id, Model model) {
-        model.addAttribute("order", orderService.getOrder(id));
+    public Mono<String> getOrder(@PathVariable long id, Model model, Principal principal) {
+        model.addAttribute("order", orderService.getOrderForUser(id, principal.getName()));
         return Mono.just("order");
     }
 }

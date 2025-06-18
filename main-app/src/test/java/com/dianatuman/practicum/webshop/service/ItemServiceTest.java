@@ -9,7 +9,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.utility.DockerImageName;
 
-// The DB will be prefilled with the data from the data.sql script
+// The DB will be prefilled with the data from the data.sql script\
 public class ItemServiceTest extends BaseServiceTest {
 
     @Container

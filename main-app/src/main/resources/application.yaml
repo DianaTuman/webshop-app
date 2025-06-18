@@ -37,3 +37,23 @@ spring:
           acquire-timeout: 45s            # Тайм-аут получения соединения из пула
           max-idle-time: 30m              # Максимальное время простоя соединения в пуле
           max-life-time: 2h               # Максимальное время жизни соединения s
+
+
+#  security:
+#    oauth2:
+#      client:
+#        provider:
+#          keycloak:
+#            authorization-uri: http://localhost:8080/realms/master/protocol/openid-connect/auth
+#            token-uri: http://localhost:8080/realms/master/protocol/openid-connect/token
+#            user-info-uri: http://localhost:8080/realms/master/protocol/openid-connect/userinfo
+#            user-name-attribute: sub
+#            jwk-set-uri: http://localhost:8080/realms/master/protocol/openid-connect/certs
+#        registration:
+#          keycloak:
+#            authorizationGrantType: authorization_code
+#            provider: keycloak
+#            client-id: yandex-test
+#            client-secret: CCiB84dv2nJS5sxBjcqTMde5zVloK5E0
+#            redirect-uri: '{baseUrl}/{action}/oauth2/code/{registrationId}'
+#            scope: openid, profile, email

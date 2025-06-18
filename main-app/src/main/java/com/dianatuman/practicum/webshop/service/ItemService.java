@@ -1,5 +1,6 @@
 package com.dianatuman.practicum.webshop.service;
 
+import com.dianatuman.practicum.webshop.dto.CartDTO;
 import com.dianatuman.practicum.webshop.dto.ItemDTO;
 import com.dianatuman.practicum.webshop.entity.Item;
 import com.dianatuman.practicum.webshop.entity.Order;
@@ -27,7 +28,7 @@ public class ItemService {
     private final ItemRepository itemRepository;
     private final OrderRepository orderRepository;
 
-    private final Map<Long, Integer> cartItems = new HashMap<>();
+    private final Map<String, CartDTO> cartItems = new HashMap<>();
 
     public ItemService(ItemMapper itemMapper, ItemRepository itemRepository, OrderRepository orderRepository) {
         this.itemMapper = itemMapper;
@@ -68,43 +69,40 @@ public class ItemService {
                 .flatMap(itemRepository::save);
     }
 
-    public void setItemCartCount(long itemId, String action) {
-        switch (action) {
-            case "plus" -> cartItems.merge(itemId, 1, Integer::sum);
-            case "minus" -> {
-                if (cartItems.containsKey(itemId)) {
-                    Integer count = cartItems.get(itemId);
-                    if (count - 1 == 0) {
-                        cartItems.remove(itemId);
-                    } else {
-                        cartItems.replace(itemId, count - 1);
-                    }
-                }
-            }
-            case "delete" -> cartItems.remove(itemId);
+    public void setItemCartCount(long itemId, String action, String username) {
+        checkUsername(username);
+        cartItems.get(username).setItemCartCount(itemId, action);
+    }
+
+    public Set<Long> getCartItems(String username) {
+        checkUsername(username);
+        return cartItems.get(username).getCartItems().keySet();
+    }
+
+    private void checkUsername(String username) {
+        if (!cartItems.containsKey(username)) {
+            cartItems.put(username, new CartDTO());
         }
     }
 
-    public Set<Long> getCartItems() {
-        return cartItems.keySet();
-    }
-
-    public ItemDTO setCount(ItemDTO dto) {
-        if (cartItems.containsKey(dto.getId())) {
-            dto.setCount(cartItems.get(dto.getId()));
+    public ItemDTO setCount(ItemDTO dto, String username) {
+        checkUsername(username);
+        if (cartItems.get(username).getCartItems().containsKey(dto.getId())) {
+            dto.setCount(cartItems.get(username).getCartItems().get(dto.getId()));
         }
         return dto;
     }
 
-    public Mono<Long> createOrder() {
-        return orderRepository.save(new Order())
+    public Mono<Long> createOrder(String username) {
+        return orderRepository.save(new Order(username))
                 .flatMapMany(order ->
-                        Flux.concat(
-                                Stream.concat(
-                                        cartItems.entrySet().parallelStream().map((entry) ->
-                                                orderRepository.createNewOrderItem(order.getId(), entry.getKey(), entry.getValue())),
-                                        Stream.of(Mono.just(order.getId()))
-                                ).toList()))
-                .doOnComplete(cartItems::clear).last();
+                        Flux.concat(Stream.concat(
+                                cartItems.get(username).getCartItems().entrySet()
+                                        .parallelStream().map((entry) ->
+                                                orderRepository.createNewOrderItem(order.getId(),
+                                                        entry.getKey(), entry.getValue())),
+                                Stream.of(Mono.just(order.getId()))
+                        ).toList()))
+                .doOnComplete(() -> cartItems.get(username).clearCart()).last();
     }
 }

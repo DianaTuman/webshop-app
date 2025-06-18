@@ -13,6 +13,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
+import java.security.Principal;
+
 @Controller
 @RequestMapping("/items")
 public class ItemsController {
@@ -24,14 +26,15 @@ public class ItemsController {
     }
 
     @GetMapping
-    public Mono<String> getItems(Model model, @RequestParam(name = "search", defaultValue = "") String search,
+    public Mono<String> getItems(Principal principal, Model model,
+                                 @RequestParam(name = "search", defaultValue = "") String search,
                                  @RequestParam(name = "pageSize", defaultValue = "10") Integer pageSize,
                                  @RequestParam(name = "pageNumber", defaultValue = "0") Integer pageNumber,
                                  @RequestParam(name = "sort", defaultValue = "") String sort) {
         Pageable pageRequest = PageRequest.of(pageNumber, pageSize);
         var itemsIds = itemService.getItemsIds(search, sort.isEmpty() ? Sort.unsorted() : Sort.by(sort).ascending());
         var itemsPage = itemsIds.flatMap(itemService::getItem)
-                .map(itemService::setCount)
+                .map(itemDTO -> itemService.setCount(itemDTO, principal.getName()))
                 .collectList()
                 .map(items -> {
                     final int start = (int) pageRequest.getOffset();
@@ -47,14 +50,16 @@ public class ItemsController {
     }
 
     @GetMapping("/{id}")
-    public Mono<String> getItem(@PathVariable(name = "id") long id, Model model) {
-        model.addAttribute("item", itemService.getItem(id).map(itemService::setCount));
+    public Mono<String> getItem(@PathVariable(name = "id") long id, Model model, Principal principal) {
+        model.addAttribute("item", itemService.getItem(id).
+                map(itemDTO -> itemService.setCount(itemDTO, principal.getName())));
         return Mono.just("item");
     }
 
     @PostMapping(path = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Mono<String> setItemCartCount(@PathVariable(name = "id") long id, @RequestPart("action") String action) {
-        itemService.setItemCartCount(id, action);
+    public Mono<String> setItemCartCount(Principal principal,
+                                         @PathVariable(name = "id") long id, @RequestPart("action") String action) {
+        itemService.setItemCartCount(id, action, principal.getName());
         return Mono.just(String.format("redirect:/items/%s", id));
     }
 

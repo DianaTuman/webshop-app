@@ -20,4 +20,8 @@ public interface OrderRepository extends ReactiveCrudRepository<Order, Long> {
     @Modifying
     @Query(value = "INSERT INTO orders_items (order_id, item_id, count) VALUES (:orderId, :itemId, :count) RETURNING order_id")
     Mono<Long> createNewOrderItem(Long orderId, Long itemId, int count);
+
+    Flux<Order> findByUsername(String username);
+
+    Mono<Order> findByIdAndUsername(Long orderId, String username);
 }

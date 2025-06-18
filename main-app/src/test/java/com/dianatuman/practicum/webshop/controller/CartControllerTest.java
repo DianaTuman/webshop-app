@@ -18,9 +18,9 @@ public class CartControllerTest extends BaseControllerTest {
         ItemDTO e1 = new ItemDTO("TestItem", "Item Description", 10.0);
         e1.setId(1L);
         e1.setCount(2);
-        when(itemService.getCartItems()).thenReturn(Set.of(1L));
+        when(itemService.getCartItems("user")).thenReturn(Set.of(1L));
         when(itemService.getItem(1L)).thenReturn(Mono.just(e1));
-        when(itemService.setCount(e1)).thenReturn(e1);
+        when(itemService.setCount(e1, "user")).thenReturn(e1);
 
         webTestClient.get()
                 .uri("/cart/items")
@@ -28,7 +28,7 @@ public class CartControllerTest extends BaseControllerTest {
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.TEXT_HTML)
                 .expectBody()
-                .xpath("//table[2]/tr[2]/td/b").isEqualTo("Total: 20.0 $");
-        verify(itemService, times(1)).getCartItems();
+                .xpath("//b[contains(text(), 'Total')]").isEqualTo("Total: 20.0 $");
+        verify(itemService, times(1)).getCartItems("user");
     }
 }

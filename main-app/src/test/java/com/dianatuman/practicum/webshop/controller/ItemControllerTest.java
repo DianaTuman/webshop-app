@@ -4,6 +4,7 @@ import com.dianatuman.practicum.webshop.dto.ItemDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -18,7 +19,7 @@ public class ItemControllerTest extends BaseControllerTest {
         e1.setId(1L);
         when(itemService.getItemsIds(any(), any())).thenReturn(Flux.just(1L));
         when(itemService.getItem(1L)).thenReturn(Mono.just(e1));
-        when(itemService.setCount(e1)).thenReturn(e1);
+        when(itemService.setCount(e1, "user")).thenReturn(e1);
 
         webTestClient.get()
                 .uri("/items")
@@ -31,12 +32,13 @@ public class ItemControllerTest extends BaseControllerTest {
     }
 
     @Test
+    @WithMockUser
     public void getItemId_shouldReturnItemPage() {
         ItemDTO e1 = new ItemDTO("TestItem", "Item Description", 10.0);
         e1.setId(1L);
         e1.setCount(1);
         when(itemService.getItem(1)).thenReturn(Mono.just(e1));
-        when(itemService.setCount(e1)).thenReturn(e1);
+        when(itemService.setCount(e1, "user")).thenReturn(e1);
 
         webTestClient.get()
                 .uri("/items/1")

@@ -19,17 +19,17 @@ public class OrderService {
         this.orderRepository = orderRepository;
     }
 
-    public Mono<OrderDTO> getOrder(long orderId) {
-        return orderRepository.findById(orderId).flatMap(this::mapOrderDTOFromEntity);
+    public Mono<OrderDTO> getOrderForUser(long orderId, String username) {
+        return orderRepository.findByIdAndUsername(orderId, username).flatMap(this::mapOrderDTOFromEntity);
     }
 
-    public Flux<OrderDTO> getOrders() {
-        return orderRepository.findAll().flatMap(this::mapOrderDTOFromEntity).sort();
+    public Flux<OrderDTO> getOrdersByUsername(String username) {
+        return orderRepository.findByUsername(username).flatMap(this::mapOrderDTOFromEntity).sort();
     }
 
     private Mono<OrderDTO> mapOrderDTOFromEntity(Order orderEntity) {
         return Mono.zip(Mono.just(orderEntity),
                         orderRepository.getOrderItems(orderEntity.getId()).map(itemMapper::orderItemToDTO).collectList())
-                .map(tuple -> new OrderDTO(tuple.getT1().getId(), tuple.getT2()));
+                .map(tuple -> new OrderDTO(tuple.getT1().getId(), tuple.getT2(), tuple.getT1().getUsername()));
     }
 }

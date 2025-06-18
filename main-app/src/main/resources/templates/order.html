@@ -6,29 +6,7 @@
 </head>
 
 <body>
-<table style="width:70%;margin-left:auto;margin-right:auto;">
-    <tr>
-        <td>
-            <a href="/orders" style="float:right;">
-                <b>ORDERS</b>
-            </a>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href="/cart/items" style="float:right;">
-                <b>CART</b>
-            </a>
-        </td>
-    </tr>
-    <tr>
-        <td>
-            <a href="/items" style="float:right;">
-                <b>HOME</b>
-            </a>
-        </td>
-    </tr>
-</table>
+<header th:insert="header.html :: header"></header>
 <h1 style="text-align:center" th:if="${param.newOrder}">Your order is placed!</h1>
 <table style="width:70%;margin-left:auto;margin-right:auto;">
     <tr>
