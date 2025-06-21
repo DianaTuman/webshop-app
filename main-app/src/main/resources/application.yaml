@@ -39,21 +39,21 @@ spring:
           max-life-time: 2h               # Максимальное время жизни соединения s
 
 
-#  security:
-#    oauth2:
-#      client:
-#        provider:
-#          keycloak:
-#            authorization-uri: http://localhost:8080/realms/master/protocol/openid-connect/auth
-#            token-uri: http://localhost:8080/realms/master/protocol/openid-connect/token
-#            user-info-uri: http://localhost:8080/realms/master/protocol/openid-connect/userinfo
-#            user-name-attribute: sub
-#            jwk-set-uri: http://localhost:8080/realms/master/protocol/openid-connect/certs
-#        registration:
-#          keycloak:
-#            authorizationGrantType: authorization_code
-#            provider: keycloak
-#            client-id: yandex-test
-#            client-secret: CCiB84dv2nJS5sxBjcqTMde5zVloK5E0
-#            redirect-uri: '{baseUrl}/{action}/oauth2/code/{registrationId}'
-#            scope: openid, profile, email
+  security:
+    oauth2:
+      client:
+        provider:
+          keycloak:
+            user-name-attribute: sub
+            token-uri: http://localhost:8082/realms/master/protocol/openid-connect/token
+            jwk-set-uri: http://localhost:8082/realms/master/protocol/openid-connect/certs
+            user-info-uri: http://localhost:8082/realms/master/protocol/openid-connect/userinfo
+            authorization-uri: http://localhost:8082/realms/master/protocol/openid-connect/auth
+        registration:
+          payment-service:
+            provider: keycloak
+            authorization-grant-type: client_credentials
+            client-id: payment-service
+            client-secret: qG809wzghjzF9tjT3Da5cqe4dBkTYOe1
+            clientAuthenticationMethod: client_secret_post
+            scope: profile

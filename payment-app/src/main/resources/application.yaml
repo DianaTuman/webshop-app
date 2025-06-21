@@ -1,6 +1,11 @@
+server:
+  port: 8081
+
 spring:
   application:
     name: webshop-payment-app
-
-server:
-  port: 8081
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8082/realms/master
