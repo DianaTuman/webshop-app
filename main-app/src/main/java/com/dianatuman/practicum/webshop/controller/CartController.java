@@ -2,6 +2,7 @@ package com.dianatuman.practicum.webshop.controller;
 
 import com.dianatuman.practicum.webshop.dto.ItemDTO;
 import com.dianatuman.practicum.webshop.service.ItemService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,6 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.security.Principal;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 @Controller
@@ -18,19 +20,12 @@ import java.util.Set;
 public class CartController {
 
     private final ItemService itemService;
-
-    private final WebClient paymentClient;
-
+    private final WebClient paymentWebClient;
     private Mono<Double> cartTotal = Mono.just(0.0);
-    String paymentService;
 
-    public CartController(ItemService itemService) {
+    public CartController(ItemService itemService, WebClient paymentWebClient) {
         this.itemService = itemService;
-        paymentService = System.getenv("PAYMENT_SERVICE");
-        if (paymentService == null || paymentService.isEmpty()) {
-            paymentService = "http://localhost:8081";
-        }
-        paymentClient = WebClient.create(paymentService);
+        this.paymentWebClient = paymentWebClient;
     }
 
     @GetMapping("/items")
@@ -40,7 +35,8 @@ public class CartController {
                 .map(itemDTO -> itemService.setCount(itemDTO, principal.getName()));
         model.addAttribute("items", cartItems.collectList());
         cartTotal = cartItems.map(item -> item.getPrice() * item.getCount()).reduce(0.0, Double::sum);
-        Mono<Double> balance = paymentClient.get().uri("/balance").retrieve().bodyToMono(Double.class)
+        Mono<Double> balance = paymentWebClient.get().uri("/balance")
+                .retrieve().bodyToMono(Double.class)
                 .onErrorReturn(-1.0);
         Mono<Boolean> canOrder = Mono.zip(cartTotal, balance)
                 .map(((orderTotal) -> (orderTotal.getT2() >= orderTotal.getT1())));
@@ -57,9 +53,12 @@ public class CartController {
 
     @PostMapping("/buy")
     public Mono<String> buyCart(Principal principal) {
-        return paymentClient.put().uri("/balance")
+        return paymentWebClient.put().uri("/balance")
                 .body(cartTotal, Double.class)
-                .retrieve().toBodilessEntity()
+                .retrieve().onStatus(
+                        HttpStatus.BAD_REQUEST::equals,
+                        response -> response.bodyToMono(String.class).map(NoSuchElementException::new))
+                .toBodilessEntity()
                 .flatMap(response ->
                         itemService.createOrder(principal.getName())
                                 .map(orderId -> String.format("redirect:/orders/%s?newOrder=true", orderId)))

@@ -10,12 +10,14 @@ The application will start at **localhost:8080**. The payment REST-service will 
 * PostgreSQL 17
 * Redis 7.4.2
 * Docker 4.40.0
+* KeyCloak 26.2.5
 
 ### **To run this application without Docker:**
 
 * **PostgreSQL** must be installed and running at **localhost:5432**.
   Environment variables **'DB_USER'** and **'DB_PASS'** must be set for accessing database and a schema named *
   *practicum** must exist in database.
+* Import realm setting to **Keycloak** from ./keycloak/realm-export.json
 * **Redis** must be installed and running at **localhost:6379**.
 * **gradle :main-app:bootRun** command to run main application
 * **gradle :payment-app:bootRun** command to run payment REST-service

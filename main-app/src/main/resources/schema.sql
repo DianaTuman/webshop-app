@@ -2,7 +2,6 @@ CREATE TABLE IF NOT EXISTS users
 (
     username character varying(255),
     password character varying(255),
-    balance double precision DEFAULT 100000.00,
     CONSTRAINT users_pkey PRIMARY KEY (username)
 );
 
@@ -36,6 +35,9 @@ CREATE TABLE IF NOT EXISTS orders
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 );
+
+insert into orders(username) values ('default');
+insert into orders(username) values ('admin');
 
 CREATE TABLE IF NOT EXISTS orders_items
 (
